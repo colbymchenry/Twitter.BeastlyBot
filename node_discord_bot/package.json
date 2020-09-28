@@ -1,0 +1,28 @@
+{
+  "name": "node_discord_bot",
+  "version": "1.0.0",
+  "description": "The node code for the subscription bot for discord.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "github:discordjs/discord.js",
+    "discord.js-commando": "^0.10.0",
+    "dotenv": "^8.2.0",
+    "erlpack": "github:discordapp/erlpack",
+    "express": "^4.17.1",
+    "flat-cache": "^2.0.1",
+    "memory-cache": "^0.2.0",
+    "mysql": "^2.18.1",
+    "node-cache": "^5.1.0",
+    "paypal-rest-sdk": "^1.8.1",
+    "redis": "^2.8.0",
+    "socket.io": "^2.3.0",
+    "sqlite": "^2.9.3",
+    "stripe": "^7.15.0",
+    "zucc": "^0.1.2"
+  }
+}

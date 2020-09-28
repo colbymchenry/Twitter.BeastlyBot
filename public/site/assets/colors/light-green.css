@@ -1,0 +1,73 @@
+a, a:hover {
+	color:#27d499;
+}
+.btn-common {
+	background-color:#27d499;
+}
+.btn-common:hover {
+	background-color:#21bb86;
+}
+#scrollUp {
+	background-color:#27d499;
+}
+.section-title h2::after, .section-title h3::after {
+	background-color:#93e9cc;
+}
+.top-info ul li a i {
+	color:#27d499;
+}
+.mainmenu nav > ul > li > a::after {
+	background-color:#27d499;
+}
+.mainmenu nav ul li ul.submenu li a:hover {
+	color:#27d499;
+}
+.service-single i {
+    color: #27d499;
+}
+.contact-form.style-1 .btn-common {
+	background-color:#27d499;
+}
+.contact-form.style-1 .btn-common:hover {
+	background-color:#21bb86;
+}
+.contact-form.style-1 input:focus, .contact-form.style-1 select:focus {
+    border-color: #27d499 !important;
+}
+.process-single i {
+    color: #27d499;
+}
+.process-single h4 {
+    color: #222222;
+}
+.blog-desc h3 a:hover {
+	color:#27d499;
+}
+.blog-date-time li a i {
+	color: #27d499;
+}
+.blog-category li a {
+    background-color: #27d499;
+}
+.subscribe-form button {
+	background-color:#27d499;
+}
+.footer-widget-title h4::after {
+	background-color:#93e9cc;
+}
+.footer-widget ul li a:hover {
+	color:#27d499;
+}
+.footer-contact h5 {
+    color:#27d499;
+}
+.social-icons.style-2 a {
+	border-color:#bef2e0;
+}
+.social-icons.style-2 a:hover {
+	background-color:#27d499;
+	border-color:#27d499;
+}
+.footer-menu ul li a:hover {
+	color:#27d499;
+}
