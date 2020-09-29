@@ -308,7 +308,7 @@ body.dark{
 }
 .social-discord {
     color: #fff;
-    background-color: #43b581 !important;
+    background-color: #1DA1F2 !important;
 }
 .put-short{
     height: 64vh;
@@ -1334,7 +1334,7 @@ input.labelauty + label > span.labelauty-unchecked-image + span.labelauty-unchec
 	position:relative;
 }
 .pricing-nav ul li a::after {
-	background-color:#3dca9a;
+	background-color:#1DA1F2;
 	height:4px;
 	width:0;
 	position:absolute;
@@ -1410,7 +1410,7 @@ input.labelauty + label > span.labelauty-unchecked-image + span.labelauty-unchec
 	margin-bottom:13px;
 }
 .pricing-table-body ul.list-sign li::before {
-	color:#3dca9a;
+	color:#1DA1F2;
 }
 .pricing-table-single .btn-common {
 	min-width:100%;
@@ -1418,7 +1418,7 @@ input.labelauty + label > span.labelauty-unchecked-image + span.labelauty-unchec
 	margin-top:30px;
 }
 .pricing-table-single.highlight .btn-common {
-	background-color:#3dca9a;
+	background-color:#1DA1F2;
 	border:0;
 	border-radius:50px;
 }
@@ -1610,15 +1610,15 @@ input.labelauty + label > span.labelauty-unchecked-image + span.labelauty-unchec
 }
 .process-single i {
 	font-size:48px;
-	color:#3f8ef7;
+	color:#1DA1F2;
 }
 .process-single h4 {
 	font-size:24px;
-	color:#3dca9a;
+	color:#1DA1F2;
 }
 .process-single span {
 	/*font-size: 80px;
-	color: #3dca9a;
+	color: #1DA1F2;
 	opacity: .20;
 	position: absolute;
 	left: 0;

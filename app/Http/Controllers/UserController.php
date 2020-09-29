@@ -17,7 +17,7 @@ use App\Subscription;
 use App\StripeConnect;
 use App\PaidOutInvoice;
 use App\Ban;
-use App\DiscordHelper;
+use App\TwitterHelper;
 use App\DiscordOAuth;
 
 class UserController extends Controller {
@@ -36,7 +36,7 @@ class UserController extends Controller {
 
             $invoices = \Stripe\Invoice::all([
                 'limit' => $num_of_invoices,
-                'customer' => auth()->user()->StripeConnect->customer_id
+                'customer' => auth()->user()->StripeConnect()->customer_id
             ]);
 
             $invoices_array = $invoices->toArray()['data'];
@@ -56,7 +56,7 @@ class UserController extends Controller {
 
         \Stripe\Stripe::setApiKey(env('STRIPE_CLIENT_SECRET'));
 
-        if (auth()->user()->StripeConnect->express_id != $stripe_account_id && !Auth::user()->admin) return response()->json(['success' => false, 'msg' => 'You do not own this Stripe account.']);
+        if (auth()->user()->StripeConnect()->express_id != $stripe_account_id && !Auth::user()->admin) return response()->json(['success' => false, 'msg' => 'You do not own this Stripe account.']);
 
         #if (auth()->user()->error == "1") return response()->json(['success' => false, 'msg' => 'Please refresh the page and connect a US Stripe account.']);
 
@@ -484,7 +484,7 @@ class UserController extends Controller {
             $user = User::where('id', $subscription->user_id)->first();
             $sub_stripe = StripeConnect::where('user_id', $subscription->user_id)->first();
 
-            $discord_helper = new DiscordHelper(auth()->user());
+            $discord_helper = new TwitterHelper(auth()->user());
             if(! $discord_helper->ownsGuild($store->guild_id)) {
                 return response()->json(['success' => false, 'msg' => 'You are not the owner of this guild. Contact Support']);
             }
@@ -652,7 +652,7 @@ class UserController extends Controller {
 
     public function getServersAndStores(){
         $discord_o_auth = DiscordOAuth::where('user_id', auth()->user()->id)->first();
-        $discord_helper = auth()->user()->getDiscordHelper();
+        $discord_helper = auth()->user()->getTwitterHelper();
 
         if($discord_helper->getGuilds()) {
             $serversstores = array(); 

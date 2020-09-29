@@ -10,8 +10,8 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    public function getDiscordHelper(): DiscordHelper {
-        return new DiscordHelper($this);
+    public function getTwitterHelper(): TwitterHelper {
+        return new TwitterHelper($this);
     }
 
     public function getStripeHelper(): StripeHelper {
@@ -22,14 +22,9 @@ class User extends Authenticatable
         return $this->getStripeHelper()->getCustomerAccount() != null;
     }
 
-    public function DiscordOAuth()
-    {
-        return $this->hasOne(DiscordOAuth::class);
-    }
-
     public function StripeConnect()
     {
-        return $this->hasOne(StripeConnect::class);
+        return StripeConnect::where('user_id', $this->id)->exists() ? StripeConnect::where('user_id', $this->id)->first() : null;
     }
 
     public function getPlanExpiration() {

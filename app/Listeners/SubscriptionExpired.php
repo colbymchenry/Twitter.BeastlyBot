@@ -40,7 +40,7 @@ class SubscriptionExpired implements ShouldQueue
             $customer_discord_id = DiscordOAuth::where('user_id', $customer_id)->first()->discord_id;
             $partner_id = $webhookCall->payload['data']['object']['items']['data'][0]['plan']['metadata']['user_id'];
             $partner_discord_id = DiscordOAuth::where('user_id', $customer_id)->first()->discord_id;
-            $discord_helper = new \App\DiscordHelper(\App\User::where('id', $customer_id)->first());
+            $discord_helper = new \App\TwitterHelper(\App\User::where('id', $customer_id)->first());
             $data = explode('_', $plan_id);
         
             if($data[0] == 'discord') {

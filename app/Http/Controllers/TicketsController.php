@@ -7,7 +7,7 @@ use App\Ticket;
 use App\Comment;
 use App\User;
 use App\AlertHelper;
-use App\DiscordHelper;
+use App\TwitterHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Mailers\AppMailer;

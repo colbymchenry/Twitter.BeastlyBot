@@ -15,7 +15,7 @@ use DateTime;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Stripe\Exception\InvalidRequestException;
-use App\DiscordHelper;
+use App\TwitterHelper;
 use App\Subscription;
 use App\PaidOutInvoice;
 use App\Stat;
@@ -29,9 +29,9 @@ class ServerController extends Controller {
     }
 
     public function getServers(){
-        $discord_helper = new DiscordHelper(auth()->user());
+        $discord_helper = new TwitterHelper(auth()->user());
         if(\request('slide') == 'true') {
-            return view('slide.slide-servers')->with('guilds', $discord_helper->getOwnedGuilds());
+            return view('slide.slide-pricing')->with('guilds', $discord_helper->getOwnedGuilds());
         } else {
             return view('servers')->with('guilds', $discord_helper->getOwnedGuilds());
         }
@@ -76,7 +76,7 @@ class ServerController extends Controller {
     -------------------------------------------------------------------- */
 
     public function getServerPage($id){
-        $discord_helper = new DiscordHelper(auth()->user());
+        $discord_helper = new TwitterHelper(auth()->user());
 
        /*if(! $discord_helper->ownsGuild($id)) {
             AlertHelper::alertError('You are not the owner of that server!');
@@ -207,7 +207,7 @@ class ServerController extends Controller {
             $store = DiscordStore::where('guild_id', $guild_id)->first();
             $desc = ProductRole::where('discord_store_id', $store->id)->first();
             $shop_url = $store->url;
-            $discord_helper = new \App\DiscordHelper(auth()->user());
+            $discord_helper = new \App\TwitterHelper(auth()->user());
             return view('slide.slide-roles-settings')->with('guild_id', $guild_id)->with('role', $discord_helper->getRole($guild_id, $role_id))->with('shop_url', $shop_url)->with('enabled', $product->active)->with('prices', ProductController::getPricesForRole($guild_id, $role_id))->with('desc', $desc);
         } catch (\Exception $e) {
             if (env('APP_DEBUG')) Log::error($e);
@@ -266,7 +266,7 @@ class ServerController extends Controller {
         $discord_store = \App\DiscordStore::where('id', $request['store_id'])->first();
         $subscriptions = \App\Subscription::where('store_id', $request['store_id'])->whereDay('latest_invoice_paid_at', '=', date('d'))->whereMonth('latest_invoice_paid_at', '=', date('m'))->whereYear('latest_invoice_paid_at', '=', date('Y'))->orderBy('latest_invoice_paid_at', 'DESC')->take(25)->get();
         foreach($subscriptions as $sub) {
-            $discord_helper = new \App\DiscordHelper(\App\User::where('id', $sub->user_id)->first());
+            $discord_helper = new \App\TwitterHelper(\App\User::where('id', $sub->user_id)->first());
 
             $start = new DateTime($sub->latest_invoice_paid_at);
             $end = new DateTime('NOW');
@@ -288,7 +288,7 @@ class ServerController extends Controller {
         $id = $request['guild'];
         $guild = DiscordStore::where('guild_id', $id)->first();
 
-        if(!\auth()->user()->getDiscordHelper()->ownsGuild($guild)) {
+        if(!\auth()->user()->getTwitterHelper()->ownsGuild($guild)) {
             return response()->json();
         }
 
@@ -330,7 +330,7 @@ class ServerController extends Controller {
             $refunds_days = 0;
         }
 
-        if(!\auth()->user()->getDiscordHelper()->ownsGuild($guild_id)) 
+        if(!\auth()->user()->getTwitterHelper()->ownsGuild($guild_id)) 
             return response()->json(['success' => false, 'msg' => 'You are not the owner of this server.']);
 
         if(DiscordStore::where('url', strtolower($url))->where('guild_id', '!=', $guild_id)->exists()) 
@@ -367,7 +367,7 @@ class ServerController extends Controller {
         $id = $request['id'];
         $live = $request['live'];
 
-        if(!\auth()->user()->getDiscordHelper()->ownsGuild(DiscordStore::where('id', $id)->value('guild_id'))) {
+        if(!\auth()->user()->getTwitterHelper()->ownsGuild(DiscordStore::where('id', $id)->value('guild_id'))) {
             return response()->json(['success' => false, 'msg' => 'You are not the owner of this server.']);
         }else {
 

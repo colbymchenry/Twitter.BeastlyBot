@@ -7,7 +7,7 @@ use App\DiscordStore;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use RestCord\DiscordClient;
-use App\DiscordHelper;
+use App\TwitterHelper;
 
 class DiscordRoleProduct extends Product
 {
@@ -32,7 +32,7 @@ class DiscordRoleProduct extends Product
         if(!$this->discord_store->live)
             throw new ProductMsgException('Sorry, purchases are disabled in testing mode.');
 
-        $discord_helper = new \App\DiscordHelper(auth()->user());
+        $discord_helper = new \App\TwitterHelper(auth()->user());
 
         $bad_guild = false;
         $bad_role = false;

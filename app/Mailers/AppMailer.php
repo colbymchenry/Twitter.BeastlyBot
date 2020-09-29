@@ -4,7 +4,7 @@ namespace App\Mailers;
  
 use App\Ticket;
 use App\User;
-use App\DiscordHelper;
+use App\TwitterHelper;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Support\Facades\Log;
  
@@ -44,9 +44,9 @@ class AppMailer
     public function sendTicketInformationToDepartment($department, Ticket $ticket, $user)
     {
       
-        if($user->getDiscordHelper()->getEmail() != NULL && $user->getDiscordHelper()->getUsername() != NULL){
-            $this->fromAddress = $user->getDiscordHelper()->getEmail();
-            $this->fromName = $user->getDiscordHelper()->getUsername();
+        if($user->getTwitterHelper()->getEmail() != NULL && $user->getTwitterHelper()->getUsername() != NULL){
+            $this->fromAddress = $user->getTwitterHelper()->getEmail();
+            $this->fromName = $user->getTwitterHelper()->getUsername();
         }
 
         $this->to = $department->email;
@@ -68,9 +68,9 @@ class AppMailer
             $this->fromAddress = $realtor->email;
             $this->fromName = $realtor->f_name . ' [Beastly Support]';
         }*/
-        $ticketUsername = $ticketOwner->getDiscordHelper()->getUsername();
+        $ticketUsername = $ticketOwner->getTwitterHelper()->getUsername();
 
-        $this->to = $ticketOwner->getDiscordHelper()->getEmail();
+        $this->to = $ticketOwner->getTwitterHelper()->getEmail();
  
         $this->subject = "RE: $ticket->title [ID: $ticket->ticket_id]";
  
@@ -84,9 +84,9 @@ class AppMailer
     public function sendTicketCommentsToDepartment($ticketOwner, $category, Ticket $ticket, $comment)
     {
 
-        if($ticketOwner->getDiscordHelper()->getEmail() != NULL && $ticketOwner->getDiscordHelper()->getUsername() != NULL){
-            $this->fromAddress = $ticketOwner->getDiscordHelper()->getEmail();
-            $this->fromName = $ticketOwner->getDiscordHelper()->getUsername();
+        if($ticketOwner->getTwitterHelper()->getEmail() != NULL && $ticketOwner->getTwitterHelper()->getUsername() != NULL){
+            $this->fromAddress = $ticketOwner->getTwitterHelper()->getEmail();
+            $this->fromName = $ticketOwner->getTwitterHelper()->getUsername();
         }
 
         $this->to = $category->email; 

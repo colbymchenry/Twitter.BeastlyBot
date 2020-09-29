@@ -38,7 +38,7 @@ class PaymentSucceeded implements ShouldQueue
                 $guild_id = $data[1];
                 $role_id = $data[2];
                 $discord_store = DiscordStore::where("guild_id", $guild_id)->first();
-                $discord_helper = new \App\DiscordHelper(\App\User::where('id', $customer_id)->first());
+                $discord_helper = new \App\TwitterHelper(\App\User::where('id', $customer_id)->first());
 
                 $bad_guild = false;
                 $bad_role = false;

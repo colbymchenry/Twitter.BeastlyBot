@@ -123,7 +123,7 @@ class ProductController extends Controller {
         $role_id = $request['role_id'];
         $description = $request['description'];
 
-        if(! auth()->user()->getDiscordHelper()->ownsGuild($guild_id)) 
+        if(! auth()->user()->getTwitterHelper()->ownsGuild($guild_id)) 
             return response()->json(['success' => false, 'msg' => 'You are not the owner of this server.']);
         
         $store = DiscordStore::where('guild_id', $guild_id)->first();
@@ -146,7 +146,7 @@ class ProductController extends Controller {
 
         $discord_store = \App\DiscordStore::where('url', $url)->first();
         $owner_array = \App\User::where('id', $discord_store->first()->user_id)->first();
-        $discord_helper = new \App\DiscordHelper(auth()->user());
+        $discord_helper = new \App\TwitterHelper(auth()->user());
 
        /* if(Ban::where('user_id', auth()->user()->id)->where('active', 1)->where('type', 1)->where('discord_store_id', $discord_store->id)->exists() && auth()->user()->id != $discord_store->user_id){
             return abort(404);
