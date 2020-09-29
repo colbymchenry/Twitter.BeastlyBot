@@ -8,7 +8,7 @@
         <ol class="breadcrumb">
             <h4 class="font-weight-100">Servers</h4>
         </ol>
-        @if(auth()->user()->StripeConnect->express_id != null)
+        @if(auth()->user()->StripeConnect()->express_id != null)
         <div class="page-header-actions add-pulse">
             <a class="btn btn-primary btn-round"
         href="{{ 'https://discordapp.com/oauth2/authorize?client_id=' . env('DISCORD_CLIENT_ID') . '&scope=bot&permissions=' . env('DISCORD_BOT_PERMISSIONS') }}" target="_blank" id="Addbtn">

@@ -13,7 +13,7 @@
 
 @section('content')
 
-@if(auth()->user()->getDiscordHelper()->ownsGuild($guild_id))
+@if(auth()->user()->getTwitterHelper()->ownsGuild($guild_id))
     @if((!App\DiscordStore::where('guild_id', $guild_id)->get()[0]->live) || $owner_array->error == '2')
         <div class="bg-dark-4 text-white text-center font-size-16 font-weight-500 w-200 mx-auto card m-0 mb-30">
             <a class="card-body p-5 text-white" href="/server/{{ $guild_id }}{{ (!auth()->user()->canAcceptPayments()) ? '#ready' : '' }}">
@@ -126,7 +126,7 @@
         </div>
     </div>
     {{--
-@if(auth()->user()->getDiscordHelper()->ownsGuild($guild_id))
+@if(auth()->user()->getTwitterHelper()->ownsGuild($guild_id))
     @if(auth()->user()->plan_sub_id !== null)
         @include('partials/clear_script')
     @endif

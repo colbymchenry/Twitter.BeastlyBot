@@ -43,7 +43,7 @@
               <div class="badge badge-lg badge-primary bg-{{ $ticket->status == 'Team Reply' ? 'green-600' : 'indigo-600' }} float-right my-1" id="step1">{{ $ticket->status }}</div>
                 <ul class="timeline timeline-icon mb-0">
                     
-                    <li class="timeline-period bg-indigo-600 rounded text-white"><b>{{ $ticket->user->getDiscordHelper()->getUsername() }}:</b> {!! nl2br($ticket->message) !!}</li>
+                    <li class="timeline-period bg-indigo-600 rounded text-white"><b>{{ $ticket->user->getTwitterHelper()->getUsername() }}:</b> {!! nl2br($ticket->message) !!}</li>
 
                     @if($ticket->comments->count() > 0)
                     @foreach($ticket->comments as $comment)
@@ -55,7 +55,7 @@
                                       @if($ticket->user->id === $comment->user_id)
                                         
                                         <span class="avatar avatar-online">
-                                            <img src="{{ $ticket->user->getDiscordHelper()->getAvatar() }}" alt="User">
+                                            <img src="{{ $ticket->user->getTwitterHelper()->getAvatar() }}" alt="User">
                                             <i></i>
                                         </span>
                                       @else

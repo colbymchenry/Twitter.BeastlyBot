@@ -8,7 +8,7 @@
 </header>
 
     <div class="page-header my-10">
-        @if(auth()->user()->StripeConnect->express_id != null)
+        @if(auth()->user()->StripeConnect()->express_id != null)
         <div class="page-header-actions add-pulse">
             <a class="btn btn-primary btn-round"
                href="{{ 'https://discordapp.com/oauth2/authorize?client_id=' . env('DISCORD_CLIENT_ID') . '&scope=bot&permissions=' . env('DISCORD_BOT_PERMISSIONS') }}" target="_blank" id="Addbtn">
@@ -16,7 +16,7 @@
                 Add Bot
             </a>
             <a href="#click-first=true" class="btn btn-primary btn-outline btn-round d-none"
-            id="Refreshbtn" data-toggle="slidePanel" data-url="/slide-servers">
+            id="Refreshbtn" data-toggle="slidePanel" data-url="/slide-pricing">
                 <i class="icon wb-refresh" aria-hidden="true"></i>
                 Refresh
             </a>
@@ -40,11 +40,7 @@
                     <tr onClick="document.location.href='/server/{{ $guild['id'] }}';" data-key="{{ $guild['id'] }}">
                         <td class="cell-100 pl-15 pl-lg-30">
                             <a class="avatar avatar-lg" href="javascript:void(0)">
-                                @if($guild['icon'] == NULL)
-                                <img src="https://i.imgur.com/qbVxZbJ.png" alt="...">
-                                @else
-                                <img src="https://cdn.discordapp.com/icons/{{ $guild['id'] }}/{{ $guild['icon'] }}.png?size=256" alt="...">
-                                @endif
+                            <img src="https://cdn.discordapp.com/icons/{{ $guild['id'] }}/{{ $guild['icon'] }}.png?size=256" alt="...">
                             </a>
                         </td>
                         <td>
@@ -52,7 +48,7 @@
                         </td>
                         <td class="cell-150 hidden-md-down text-center">
                             @if(\App\DiscordStore::where('guild_id', $guild['id'])->exists())
-                            <div class="time" id="subCount{{ $guild['id'] }}">{{ \App\Subscription::where('store_id', \App\DiscordStore::where('guild_id', $guild['id'])->first()->id)->where('status', '<=', 3)->count() }} Subscribers</div>
+                            <div class="time" id="subCount{{ $guild['id'] }}">{{ sizeof(\App\Http\Controllers\ServerController::getUsersRoles(\App\DiscordStore::where('guild_id', $guild['id'])->first()->id)) }} Subscribers</div>
                             @else
                             <div class="time" id="subCount{{ $guild['id'] }}">0 Subscribers</div>
                             @endif

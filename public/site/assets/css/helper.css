@@ -3,7 +3,7 @@
 /*----------------------------------------*/
 a {transition:all 0.3s ease 0s;text-decoration:none;}
 a, a:hover {
-  color: #38c3c8;
+  color: #1DA1F2;
   text-decoration: none;
 }
 a:active, a:hover, a:focus {
@@ -122,7 +122,7 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 /*  Button CSS
 /*----------------------------------------*/
 .btn-common {
-	background-color:#38c3c8;
+	background-color:#1DA1F2;
 	font-family: 'Nunito', sans-serif;
     font-size: 16px;
     font-weight: 700;
@@ -141,7 +141,7 @@ input:-moz-placeholder, textarea:-moz-placeholder {
     color: #ffffff;
 }
 .btn-common.btn-pink {
-	background-color:#3dca9a;
+	background-color:#1DA1F2;
 }
 .btn-common.btn-pink:hover {
 	box-shadow: 6px 10.392px 27px 0px rgba(30, 216, 108, 0.2);
@@ -149,22 +149,22 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 }
 .btn-common.btn-white {
 	background-color:#ffffff;
-	color:#3dca9a;
+	color:#1DA1F2;
 }
 .btn-common.btn-white:hover {
-	background-color:#3dca9a;
+	background-color:#1DA1F2;
 	color:#ffffff;
 }
 .btn-common.br-type {
 	background-color:transparent;
-	border:2px solid #3dca9a;
+	border:2px solid #1DA1F2;
 	color:#154c39;
 	background-color:transparent;
 	border-radius:50px;
 }
 .btn-common.br-type:hover {
-	background-color:#3dca9a;
-	border-color:#3dca9a;
+	background-color:#1DA1F2;
+	border-color:#1DA1F2;
 	color:#ffffff;
 }
 .btn-common.br-e8e8e8 {
@@ -592,7 +592,7 @@ button.btn-common {
 .bg-4fa65c {background-color:#4fa65c;}
 .bg-186f72 {background-color:#186f72;}
 .bg-38c3c7 {background-color:#38c3c7;}
-.bg-3dca9a {background-color:#3dca9a}
+.bg-1DA1F2 {background-color:#1DA1F2}
 
 /* Yellow Background */
 .bg-fcb700 {background-color:#fcb700 !important;}
@@ -602,7 +602,7 @@ button.btn-common {
 .bg-grey-1 {background-color:#2C2F33 !important}
 .bg-grey-2 {background-color:#26262b !important}
 /* Pink Background */
-.bg-fb5c71 {background-color:#3dca9a !important;}
+.bg-fb5c71 {background-color:#1DA1F2 !important;}
 
 .br-bottom {border-bottom:1px solid #ebebeb;}
 .bg-black {background-color:#181818;}

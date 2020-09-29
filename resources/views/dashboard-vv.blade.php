@@ -216,7 +216,7 @@
                     <div class="counter counter-lg counter-inverse blue-grey-600 vertical-align h-md-100 h-only-xs-100 h-only-sm-100">
                       <div class="vertical-align-middle">
                         <div class="counter-icon mb-5"><i class="icon icon-shop text-white font-size-50 mb--10" aria-hidden="true"></i></div>
-                        <span class="counter-number text-white">Shops</span>
+                        <span class="counter-number text-white">Pricing</span>
                       </div>
                     </div>
                 </a>

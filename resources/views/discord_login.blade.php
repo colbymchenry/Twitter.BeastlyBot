@@ -9,9 +9,9 @@
       <div class="page-content vertical-align-middle animation-slide-top animation-duration-1">
       <!--<h2 class="grey-100">Discord Bot <sup><small>VIP</small></sup></h2>-->
       <div class="pb-5">
-        <h2 class="mb-0" style="color:#151516"><i class="icon icon-discord" aria-hidden="true"></i></h2>
+        <h2 class="mb-0" style="color:#151516"><i class="icon icon-twitter" aria-hidden="true"></i></h2>
         <h2 class="grey-200 mt-10">BeastlyBot</h2>
-        <p><i>The beastly subscription bot for communities.</i></p>
+        <p><i>The beastly subscription bot for Twitter and Discord.</i></p>
       </div>
         <!--<form method="post" role="form">
           <div class="input-group">
@@ -26,9 +26,9 @@
         </form>-->
         <form>
         <button type="button" class="btn btn-lg btn-tagged social-discord ladda-button" data-style="slide-up" data-plugin="ladda"
-        onclick="window.location.href='{{ env('DISCORD_OAUTH_URL') }}'">
-            <span class="btn-tag"><i class="icon icon-discord" aria-hidden="true"></i></span>
-            <span class="ladda-label">Login with Discord</span>
+        onclick="window.location.href='{{ route('twitter.login') }}'">
+            <span class="btn-tag"><i class="icon icon-twitter" aria-hidden="true"></i></span>
+            <span class="ladda-label">Login with Twitter</span>
             <span class="ladda-spinner"></span>
         </button>
         </form>

@@ -40,7 +40,7 @@
     @endif
     <div class="card">
               <div class="card-header">
-              Shop Guilds
+              Recent Payments
               </div> 
               <div class="card-block p-0">
                 <ul class="list-group list-group-full list-group-dividered list-group-no-hover mb-0" id="guilds-dropdown">
@@ -92,14 +92,11 @@
                           <div class="overlay-panel vertical-align">
                             <div class="vertical-align-middle prof">
                               <a class="avatar avatar-100 float-left prof-20 mr-20" href="javascript:void(0)">
-                                <img src="{{ auth()->user()->getDiscordHelper()->getAvatar() }}" alt="">
+                                <img src="{{ auth()->user()->getTwitterHelper()->getAvatar() }}" alt="">
                               </a>
 
                               <div class="float-left text-white">
-                                <div class="font-size-20 mt-20">{{ auth()->user()->getDiscordHelper()->getUsername() }}</div>
-                                  <p class="mb-20 text-nowrap">
-                                    <span class="text-break">{{ auth()->user()->getDiscordHelper()->getEmail() }}</span>
-                                  </p>
+                                <div class="font-size-20 mt-30">{{ auth()->user()->getTwitterHelper()->getUsername() }}</div>
                               </div>
 
                             </div>
@@ -117,9 +114,9 @@
                                 <i class="wb-more-horizontal"></i>
                               </a>
                             </div>
-                           {{-- @if(auth()->user()->StripeConnect->express_id != null && auth()->user()->error != '1')
+                           {{-- @if(auth()->user()->StripeConnect()->express_id != null && auth()->user()->error != '1')
                             <div class="col-6 col-sm-12">
-                              <a href="javascript:void(0);" class="btn-75 pt-25 bd-top" data-toggle="site-sidebar" data-url="/slide-payout/{{ auth()->user()->StripeConnect->express_id }}">
+                              <a href="javascript:void(0);" class="btn-75 pt-25 bd-top" data-toggle="site-sidebar" data-url="/slide-payout/{{ auth()->user()->StripeConnect()->express_id }}">
                                   <i class="icon-stripe"></i>
                               </a>
                             </div>
@@ -295,8 +292,8 @@
                 <a href="javascript:void(0);" class="card card-block card-hover" id="servers-block" data-toggle="slidePanel" data-url="/servers?slide=true">
                     <div class="counter counter-lg counter-inverse blue-grey-100 vertical-align h-md-100 h-only-xs-100 h-only-sm-100">
                       <div class="vertical-align-middle">
-                        <div class="counter-icon mb-15"><i class="icon icon-shop text-white font-size-50 mb--10" aria-hidden="true"></i></div>
-                        <span class="counter-number text-white">Shops</span>
+                        <div class="counter-icon mb-15"><i class="icon icon-money text-white font-size-50 mb--10" aria-hidden="true"></i></div>
+                        <span class="counter-number text-white">Pricing</span>
                       </div>
                     </div>
                 </a>
@@ -599,7 +596,7 @@ $('#notifications_modal').on('hide.bs.modal', function() {
   setTimeout(function(){
         Swal.fire({
             title: "New Refund Request",
-            html: "User: {{ $refundrequest->getUser()->getDiscordHelper()->getUsername() }}<br>Role: {{ $refundrequest->role_name }}<br>Purchase Date: {{ Carbon\Carbon::createFromTimestamp($refundrequest->start_date)->toDateTimeString() }}@if(($refundrequest->refunds_enabled) == '1')<br><br><b>Your Refund Policy: </b>{{ $refundrequest->refund_days }} days, @if(($refundrequest->refund_terms) == '1')No Questions Asked @endif @if(($refundrequest->refund_terms) == '2')by server owner discretion with reason. @endif @endif",
+            html: "User: {{ $refundrequest->getUser()->getTwitterHelper()->getUsername() }}<br>Role: {{ $refundrequest->role_name }}<br>Purchase Date: {{ Carbon\Carbon::createFromTimestamp($refundrequest->start_date)->toDateTimeString() }}@if(($refundrequest->refunds_enabled) == '1')<br><br><b>Your Refund Policy: </b>{{ $refundrequest->refund_days }} days, @if(($refundrequest->refund_terms) == '1')No Questions Asked @endif @if(($refundrequest->refund_terms) == '2')by server owner discretion with reason. @endif @endif",
             // html: "<b>Refund Policy:</b> 15 days by server owner discretion with reason.<br>Username: SnowFalls<br>Role: VIP Member<br>Purchase Date: 05/06/19<br>Reason: Here is the request reason the user entered",
             footer: '<span class=\"text-white text-center\"><div class=\"checkbox-custom checkbox-default\"><input type=\"checkbox\" id=\"sub_ban\" name=\\"inputSub_ban\" autocomplete=\"off\"><label for=\"inputSub_ban\">Ban user from future purchases?</label></div></span>',
             type: 'warning',

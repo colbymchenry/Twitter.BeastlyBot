@@ -2,7 +2,7 @@
 
 use App\Shop;
 use App\DiscordStore;
-use App\DiscordHelper;
+use App\TwitterHelper;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use App\Products\DiscordRoleProduct;
@@ -14,7 +14,7 @@ Route::get('/slide-product-purchase/{guild_id}/{role_id}', function($guild_id, $
         return view('slide.slide-product-purchase')->with('shop', DiscordStore::where('guild_id', $guild_id)->first())->with('role_id', $role_id)->with('prices', ProductController::getPricesForRole($guild_id, $role_id))->with('affiliate_id', \request('affiliate_id'));
     }
 
-    $discord_helper = new DiscordHelper(auth()->user());
+    $discord_helper = new TwitterHelper(auth()->user());
     $guild = $discord_helper->getGuild($guild_id);
     $role = $discord_helper->getRole($guild_id, $role_id);
     $plans = array();

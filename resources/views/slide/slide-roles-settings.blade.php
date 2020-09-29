@@ -13,7 +13,7 @@
         aria-hidden="true"></button>
     @endif
     </div>
-    <h1>Product Settings @if($special)<span class="text-bold">| {{ $user()->getDiscordHelper()->getUsername() }}</span>@endif</h1>
+    <h1>Product Settings @if($special)<span class="text-bold">| {{ $user()->getTwitterHelper()->getUsername() }}</span>@endif</h1>
     <p><span id="role_name"></span></p>
 </header>
 

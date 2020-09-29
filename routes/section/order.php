@@ -27,7 +27,7 @@ Route::get('/slide-invoice', function() {
 
         
     if($invoice != null) {
-        $discord_helper = new \App\DiscordHelper(\App\User::where('id', \request('user_id'))->first());
+        $discord_helper = new \App\TwitterHelper(\App\User::where('id', \request('user_id'))->first());
         $guild = $discord_helper->getGuild(\request('guild_id'));
         $role = $discord_helper->getRole($guild->id, \request('role_id'));
         return view('slide.slide-invoice')->with('invoice', $invoice)->with('username', $discord_helper->getUsername())->with('role', $role)->with('guild', $guild);

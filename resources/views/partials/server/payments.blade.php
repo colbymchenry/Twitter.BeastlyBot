@@ -65,7 +65,7 @@
                                     @foreach($subscriptions as $subscription)
                                         @php
                                     
-                                        $discord_helper = new \App\DiscordHelper(\App\User::where('id', $subscription->user_id)->first());
+                                        $discord_helper = new \App\TwitterHelper(\App\User::where('id', $subscription->user_id)->first());
                                         $role = $discord_helper->getRole($id, $subscription->metadata['role_id']);
                                         @endphp
                                         <tr data-url="/slide-invoice?id={{ $subscription->latest_invoice_id }}&user_id={{ $subscription->user_id }}&role_id={{ $role->id }}&guild_id={{ $id }}" data-toggle="slidePanel">

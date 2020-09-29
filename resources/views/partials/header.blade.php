@@ -70,7 +70,7 @@
                 <li class="nav-item">
                     <a class="nav-link navbar-avatar" href="javascript:void(0)" data-toggle="site-sidebar" data-url="/slide-account-settings" role="button">
                         <span class="avatar avatar-online">
-                            <img src="{{ auth()->user()->getDiscordHelper()->getAvatar() }}" alt="User">
+                            <img src="{{ auth()->user()->getTwitterHelper()->getAvatar() }}" alt="User">
                             <i></i>
                         </span>
                     </a>
@@ -121,7 +121,7 @@
                         </a>
                     </li> -->
                     <li class="site-menu-category">SHOP
-                        @if(!auth()->user()->getStripeHelper()->hasExpressPlan() && auth()->user()->StripeConnect->express_id != null)
+                        @if(!auth()->user()->getStripeHelper()->hasExpressPlan() && auth()->user()->StripeConnect()->express_id != null)
                         <a href="#" class="site-menu-badge" data-toggle="modal" data-target="#partnerPricingModal">
                             <span class="badge badge-pill badge-success text-capitalize mt-10 responsive-hide">Go Live</span>
                         </a>
@@ -135,11 +135,11 @@
                         </a>
                         @endif
                     </li>
-                    @if(auth()->user()->StripeConnect->express_id != null && auth()->user()->error != "1")
+                    @if(auth()->user()->StripeConnect()->express_id != null && auth()->user()->error != "1")
                         <li class="dropdown site-menu-item {{ Request::is('servers') ? 'active' : '' }}">
                             <a data-toggle="dropdown" href="/servers">
-                                <i class="site-menu-icon icon-shop" aria-hidden="true"></i>
-                                <span class="site-menu-title">Servers</span>
+                                <i class="site-menu-icon icon-money" aria-hidden="true"></i>
+                                <span class="site-menu-title">Pricing</span>
                             </a>
                         </li>
                         <li class="dropdown site-menu-item {{ Request::is('promotions') ? 'active' : '' }}">
@@ -151,7 +151,7 @@
                     @else
                     <li class="dropdown site-menu-item has-sub">
                         <a href="javascript:void(0)" data-dropdown-toggle="false">
-                            <i class="site-menu-icon icon-shop" aria-hidden="true"></i>
+                            <i class="site-menu-icon icon-money" aria-hidden="true"></i>
                             <span class="site-menu-title">Create Shop</span>
                             <span class="site-menu-arrow"></span>
                         </a>
@@ -202,7 +202,7 @@
                     <li class="site-menu-category">Beastly</li>
                        <li class="site-menu-item">
                             <a href="https://beastlybot.com/about">
-                                <i class="site-menu-icon icon-discord" aria-hidden="true"></i>
+                                <i class="site-menu-icon icon-twitter" aria-hidden="true"></i>
                                 <span class="site-menu-title">About</span>
                             </a>
                         </li>

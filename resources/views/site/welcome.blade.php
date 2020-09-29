@@ -2,8 +2,8 @@
 
 @section('title', 'Welcome')
 @section('metadata')
-<meta name="description" content="The beastly subscription bot for Discord, monetize roles & earn from your server.">
-<meta name="keywords" content="BeastlyBot, Beastly Bot, Discord, Subscription, Payments, Roles">
+<meta name="description" content="The beastly subscription bot for Twitter, monetize followers & earn from your feed.">
+<meta name="keywords" content="BeastlyBot, Beastly Bot, Twitter, Subscription, Payments, Feed, Private">
 <meta name="author" content="BeastlyBot">
 @endsection
 @section('content')
@@ -40,14 +40,13 @@
                             <h1 class="mb-10"><span class="text-white">Beastly Bot</span></h1>
                         </div>
                         <div class="wow fadeInUp" data-wow-delay=".2s" style="visibility:hidden">
-                            <p class="mb-20">The beastly subscription bot for Discord,<br/> sell in-chat roles and
-                                manage payments with Beastly.</p>
+                            <p class="mb-20">The beastly subscription bot for Twitter,<br/> monetize followers & earn from your feed.</p>
                         </div>
                         <div class="banner-action wow fadeInUp" data-wow-delay=".3s" style="visibility:hidden">
                             @auth
-                                <a href="https://discord.beastlybot.com/dashboard" class="btn-common radius-50 btn-pink mr-20">Dashboard</a>
+                                <a href="{{ env('APP_URL') }}/dashboard" class="btn-common radius-50 btn-pink mr-20">Dashboard</a>
                             @else
-                                <a href="https://discord.beastlybot.com/dashboard" class="btn-common radius-50 btn-pink mr-20">Create Shop</a>
+                                <a href="{{ env('APP_URL') }}/dashboard" class="btn-common radius-50 btn-pink mr-20">Create Shop</a>
                             @endauth
                         </div>
                     </div>
@@ -59,38 +58,6 @@
     </div>
     <!--banner ends-->
 
-    <!--banner starts-->
-    <!--<div class="banner-area bg-3 pt-270 pt-sm-151">
-			<div class="container">
-				<div class="row align-items-center">
-					<div class="col-lg-5 col-md-6">
-						<div class="banner-caption">
-							<div class="wow fadeInUp" data-wow-delay=".3s">
-								<h3><span>The Beastly</span></h3>
-                            </div>
-                            <div class="wow fadeInUp" data-wow-delay=".4s">
-								<h2><span>Subscription Bot</span></h2>
-							</div>
-							<div class="wow fadeInUp" data-wow-delay=".5s">
-								<h2 class="mb-20"><span>for Discord</span></h2>
-							</div>
-
-							<div class="banner-action wow fadeInUp" data-wow-delay=".6s">
-								<a href="" class="btn-common radius-50 btn-pink mr-20">Create Store</a>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-7 col-md-6">
-						<div class="banner-image wow fadeIn">
-							<img src="{{ asset('site/assets/images/3.png') }}" alt="" />
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>-->
-    <!--banner ends-->
-
-
     <div class="cta-area mt-40 mt-sm-55">
         <div class="container">
             <div class="row">
@@ -99,8 +66,8 @@
                         <div class="row height-180 align-items-center">
                             <div class="col-lg-9">
                                 <div class="cta-text">
-                                    <h3>Start your Discord Shop!</h3>
-                                    <p>More Traffic, More Exposure, More Members, with Beastly Bot</p>
+                                    <h3>Start your Twitter Shop!</h3>
+                                    <p>More Traffic, More Exposure, More Followers, with Beastly Bot</p>
                                 </div>
                             </div>
                             <div class="col-lg-3">
@@ -109,8 +76,8 @@
                                         <a href="/dashboard"
                                            class="btn-common mt-sm-25">Go to dashboard</a>
                                     @else
-                                        <a href="https://discord.beastlybot.com/dashboard"
-                                           class="btn-common mt-sm-25">Login with Discord</a>
+                                        <a href="{{ route('twitter.login') }}"
+                                           class="btn-common mt-sm-25">Login with Twitter</a>
                                     @endauth
                                 </div>
                             </div>
@@ -128,14 +95,14 @@
                 <div class="col-lg-7">
                     <div class="section-title mb-40">
                         <h2><span>Take subscription payments</span></h2><br/>
-                        <h2><span>from Discord</span></h2>
-                        <p class="mt-35">Beastly Bot is the best subscription bot for Discord, fully managing
-                            subscription payments and user role management for your server. </p>
+                        <h2><span>from Twitter</span></h2>
+                        <p class="mt-35">Beastly Bot is the best subscription bot for Twitter, fully managing
+                            subscription payments for followers and your feed. </p>
                     </div>
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="service-single style-2 wow fadeInUp" data-wow-delay=".3s">
-                                <i class="icon-discord"></i>
+                                <i class="icon-twitter"></i>
                                 <div class="service-single-brief">
                                     <h4><span>Mr. Beastly</span></h4>
                                     <p>The Beastly Bot is smart. It does it all. Running on your own custom shop URL beastly.store!</p>

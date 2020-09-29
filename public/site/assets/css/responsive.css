@@ -533,7 +533,7 @@
 	width:85%;
 }
 .section-title h1::after, .section-title h2::after, .section-title h3::after, .section-title h4::after, .section-title h5::after, .section-title h6::after {
-    background-color: #3f8ef7;
+    background-color: #1DA1F2;
     height: 4px;
     width: 100%;
     position: absolute;

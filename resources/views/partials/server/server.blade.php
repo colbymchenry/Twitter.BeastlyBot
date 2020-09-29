@@ -102,7 +102,7 @@
                                     @foreach(\App\Subscription::where('store_id', $shop->id)->whereDay('latest_invoice_paid_at', '=', date('d'))->whereMonth('latest_invoice_paid_at', '=', date('m'))->whereYear('latest_invoice_paid_at', '=', date('Y'))->orderBy('latest_invoice_paid_at', 'DESC')->take(25)->get() as $sub) 
                                     @php
                                         $discord_id = \App\DiscordOAuth::where('user_id', $sub->user_id)->first()->discord_id;
-                                        $discord_helper = new \App\DiscordHelper(\App\User::where('id', $sub->user_id)->first());
+                                        $discord_helper = new \App\TwitterHelper(\App\User::where('id', $sub->user_id)->first());
 
                                         $start = new DateTime($sub->latest_invoice_paid_at);
                                         $end = new DateTime('NOW');

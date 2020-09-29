@@ -2,7 +2,7 @@
 
 use App\AlertHelper;
 
-use App\DiscordHelper;
+use App\TwitterHelper;
 use App\Subscription;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Log;
@@ -26,7 +26,7 @@ Route::group(['middleware' => ['auth', 'web']], function () {
     });
 
     Route::get('/account/subscriptions', function() {
-        return view('subscriptions')->with('discord_helper', new \App\DiscordHelper(auth()->user()));
+        return view('subscriptions')->with('discord_helper', new \App\TwitterHelper(auth()->user()));
     });
 
     Route::get('/slide-account-subscriptions', function() {

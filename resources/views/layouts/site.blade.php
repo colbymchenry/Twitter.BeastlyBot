@@ -10,8 +10,8 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#3f8ef7">
-    <meta name="msapplication-TileColor" content="#3f8ef7">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#1DA1F2">
+    <meta name="msapplication-TileColor" content="#1DA1F2">
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-title" content="BeastlyBot">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -194,15 +194,15 @@
                                 </ul>
                             </nav>
                         </div>
-                        <button type="button" class="btn radius-50 help-line style-2" onclick="window.location.href = 'https\:\/\/discord.beastlybot.com\/dashboard' ">
+                        <button type="button" class="btn radius-50 help-line style-2" onclick="window.location.href = '{{ env('APP_URL') }}/dashboard' ">
                             {{--@auth--}}
-                            <a href="https://discord.beastlybot.com/dashboard">
-                                <i class="icon-discord"></i>
+                            <a href="/dashboard">
+                                <i class="icon-twitter"></i>
                                 Dash<span class="ds-sm-none">board</span></a>
                             {{--@else
-                                <a href="{{ env('DISCORD_OAUTH_URL') }}">
-                                <i class="icon-discord"></i> Login<span
-                                        class="ds-sm-none"> with Discord</span></a>
+                                <a href="{{ route('twitter.login') }}">
+                                <i class="icon-twitter"></i> Login<span
+                                        class="ds-sm-none"> with Twitter</span></a>
                             @endauth--}}
                         </button>
                         <!--<div class="site-lang in-right">
@@ -283,7 +283,7 @@
                     </div>
                     <ul class="list-none">
                         <li><a href="https://beastlybot.com/faq">Frequently Asked Questions</a></li>
-                        <li><a href="https://discord.beastlybot.com/dashboard">Help Tutorials</a></li>
+                        <li><a href="{{ env('APP_URL') }}/dashboard">Help Tutorials</a></li>
                     </ul>
                 </div>
             </div>

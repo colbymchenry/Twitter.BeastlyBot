@@ -45,17 +45,20 @@ Route::get('/slide-help-creating-a-promotion', function () {
 });
 
 Route::get('/impersonate/{id}', 'UserController@impersonate');
-Route::domain('beastlybot.com')->group(function ($router) {
-    require_once __DIR__ . "/section/site.php";
-});
-Route::domain('discord.beastlybot.com')->group(function ($router) {
+
+// Route::domain('beastlybot.com')->group(function ($router) {
+//     require_once __DIR__ . "/section/site.php";
+// });
+// Route::domain('discord.beastlybot.com')->group(function ($router) {
+require_once __DIR__ . "/section/twitter.php";
 require_once __DIR__ . "/section/auth.php";
 require_once __DIR__ . "/section/help.php";
-});
+// });
+
 /**
  * All routes that require authentication
  */
-Route::domain('discord.beastlybot.com')->group(function ($router) {
+// Route::domain('discord.beastlybot.com')->group(function ($router) {
     
 Route::group(['middleware' => ['auth', 'web']], function () {
   
@@ -71,6 +74,6 @@ Route::group(['middleware' => ['auth', 'web']], function () {
     require_once __DIR__ . "/section/admin.php";
     require_once __DIR__ . "/section/ticket.php";
     });
-});
+// });
 
 /* test */
