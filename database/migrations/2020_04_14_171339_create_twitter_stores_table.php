@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDiscordStoresTable extends Migration
+class CreateTwitterStoresTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateDiscordStoresTable extends Migration
      */
     public function up()
     {
-        Schema::create('discord_stores', function (Blueprint $table) {
+        Schema::create('twitter_stores', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('guild_id')->unique();
+            $table->bigInteger('twitter_id')->unique();
             $table->string('user_id');
             $table->string('url')->unique();
             $table->boolean('live')->default(false);
@@ -35,6 +35,6 @@ class CreateDiscordStoresTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('discord_stores');
+        Schema::dropIfExists('twitter_stores');
     }
 }

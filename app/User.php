@@ -14,6 +14,10 @@ class User extends Authenticatable
         return new TwitterHelper($this);
     }
 
+    public function getTwitterAccount(): TwitterAccount {
+        return TwitterAccount::where('user_id', $this->id)->exists() ? TwitterAccount::where('user_id', $this->id)->first() : null;
+    }
+
     public function getStripeHelper(): StripeHelper {
         return new StripeHelper($this);
     }

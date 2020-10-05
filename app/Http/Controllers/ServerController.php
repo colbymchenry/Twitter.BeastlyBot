@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\AlertHelper;
-use App\DiscordStore;
+use App\TwitterStore;
 #use App\Shop;
 use App\User;
 use App\Product;
@@ -29,12 +29,11 @@ class ServerController extends Controller {
     }
 
     public function getServers(){
-        $discord_helper = new TwitterHelper(auth()->user());
-        if(\request('slide') == 'true') {
-            return view('slide.slide-pricing')->with('guilds', $discord_helper->getOwnedGuilds());
-        } else {
-            return view('servers')->with('guilds', $discord_helper->getOwnedGuilds());
-        }
+        $twitter_helper = auth()->user()->getTwitterHelper();
+        $twitter_store = TwitterStore::where('twitter_id', auth()->user()->getTwitterAccount()->twitter_id)->first();
+        $prices = ProductController::getPricesTwitterAccount(auth()->user()->getTwitterAccount()->twitter_id);
+        \Log::info($prices);
+        return view('slide.slide-pricing')->with('prices', $prices);
     }
 
     public static function getUsersRoles($store_id) {

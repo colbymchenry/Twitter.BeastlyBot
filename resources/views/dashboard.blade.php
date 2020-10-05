@@ -197,10 +197,12 @@
         <div class="col-12 order-1 order-md-2"> <!-- begin next column -->
 
         <div class="row">
-            <!--<div class="col-12 hidden-md-down visible-xs-down">
-              <p class="mb-2 font-weight-100">Account</p>
-            </div>-->
+      
+          @if(auth()->user()->getStripeHelper()->isExpressUser())
+            <div class="col-6 col-sm-3">
+          @else
             <div class="col-12 col-sm-6">
+          @endif
                 <a href="/account/subscriptions" class="card card-block card-hover mb-25" id="tour_subscriptions-block">
                     <div class="counter counter-lg counter-inverse blue-grey-100 vertical-align h-md-100 h-only-xs-100 h-only-sm-100">
                       <div class="vertical-align-middle">
@@ -211,83 +213,19 @@
               </a>
             </div>
 
-            <!--<div class="col-6 col-sm-3">
-                <a href="javascript:void(0);" class="card card-block card-hover mb-25">
-                    <div class="counter counter-lg counter-inverse blue-grey-100 vertical-align h-md-100 h-only-xs-100 h-only-sm-100" data-toggle="slidePanel" data-url="/slide-account-payments">
-                      <div class="vertical-align-middle">
-                        <div class="counter-icon mb-15"><i class="icon wb-order text-white" aria-hidden="true"></i></div>
-                        <span class="counter-number text-white">Payments</span>
-                      </div>
-                    </div>
-                </a>
-            </div>-->
-
-
-
-            <!--<div class="col-6 col-md-4 col-lg-3 col-xxl-3">
-                <a href="/account/settings" class="card card-block btn btn-primary">
-                    <div class="counter counter-lg counter-inverse blue-grey-100 vertical-align h-md-150 h-only-xs-100 h-only-sm-100">
-                      <div class="vertical-align-middle">
-                        <div class="counter-icon mb-5"><i class="icon wb-user-circle text-white" aria-hidden="true"></i></div>
-                        <span class="counter-number text-white">Settings</span>
-                      </div>
-                    </div>
-                </a>
-            </div>-->
-
           @if(auth()->user()->getStripeHelper()->isExpressUser())
 
-            {{--V1 
-            @if(auth()->user()->error == "1")
-
-
-            <div class="col-12 col-sm-6">
-                <a href="javascript:void(0);" class="card card-block pulse card-hover"
-                    id="btn_start-shop-block">
-                    <i class="icon wb-info-circle l-up text-white" aria-hidden="true"
-                      data-plugin="webuiPopover"
-                      data-content="&lt;p&gt;Once connected you must re-enable all active Products and reset all prices. Your Live account is still active for the term. Please contact support at with any other concerns (team@beastly.app).&lt;/p&gt;" data-trigger="hover"
-                      data-animation="pop"></i>
-                    <div class="counter counter-lg counter-inverse blue-grey-100 vertical-align h-100">
+          <div class="col-6 col-sm-3">
+                <a href="javascript:void(0);" class="card card-block card-hover" id="transactions-block" data-toggle="slidePanel" data-url="/transactions">
+                    <div class="counter counter-lg counter-inverse blue-grey-100 vertical-align h-md-100 h-only-xs-100 h-only-sm-100">
                       <div class="vertical-align-middle">
-                        <div class="counter-icon mb-5"><i class="icon-shop text-white" aria-hidden="true"></i></div>
-                        <span class="counter-number text-white">Stripe Payment Failure</span>
-                        <p class="font-size-12 text-white">Please connect a US Stripe account.</p>
+                        <div class="counter-icon mb-15"><i class="icon icon-money text-white font-size-50 mb--10" aria-hidden="true"></i></div>
+                        <span class="counter-number text-white">Transactions</span>
                       </div>
-                    </div>
-                </a>
-                <a href="{{ 'https://connect.stripe.com/express/oauth/authorize?redirect_uri=' . env('APP_URL') . '&client_id=' . env('STRIPE_CLIENT_ID') }}" class="d-none card card-block btn btn-primary bg-blue-600 ladda-button"
-                    id="btn_connect-stripe-block" data-style="slide-up" data-plugin="ladda">
-                    <i class="icon wb-info-circle l-up text-white" aria-hidden="true"
-                      data-plugin="webuiPopover"
-                      data-content="&lt;p&gt;@lang('lang.connect_stripe') (MUST BE USA ACCOUNT)&lt;/p&gt;" data-trigger="hover"
-                      data-animation="pop"></i>
-                    <div class="counter counter-lg counter-inverse blue-grey-100 vertical-align h-100">
-                      <div class="vertical-align-middle ladda-label">
-                        <div class="counter-icon mb-5"><i class="icon-stripe text-white" aria-hidden="true"></i></div>
-                        <span class="counter-number text-white">Connect Stripe</span>
-                      </div>
-                      <span class="ladda-spinner"></span>
                     </div>
                 </a>
             </div>
 
-            <script type="text/javascript">
-                function changeBtn() {
-                    $('#btn_connect-stripe-block').removeClass('d-none');
-                    $('#btn_start-shop-block').addClass('d-none');
-                }
-                window.onload = function () {
-                    document.getElementById("btn_start-shop-block").addEventListener('click', changeBtn);
-                }
-            </script>
-
-
-            @else --}}
-
-           <!--<div class="col-12 hidden-md-down visible-xs-down">
-              <p class="mb-1 font-weight-100">Shop</p>
-            </div>-->
             <div class="col-6 col-sm-3">
                 <a href="javascript:void(0);" class="card card-block card-hover" id="servers-block" data-toggle="slidePanel" data-url="/servers?slide=true">
                     <div class="counter counter-lg counter-inverse blue-grey-100 vertical-align h-md-100 h-only-xs-100 h-only-sm-100">
@@ -309,20 +247,6 @@
                     </div>
                 </a>
             </div>
-
-            <!--<div class="col-6 col-lg-3 col-xxl-3">
-                <a href="javascript:void(0);" class="card card-block btn btn-primary" data-toggle="slidePanel" data-url="slide-payout">
-                    <div class="counter counter-lg counter-inverse blue-grey-100 vertical-align h-md-150 h-only-xs-100 h-only-sm-100">
-                      <div class="vertical-align-middle">
-                        <div class="counter-icon mb-5"><i class="icon icon-right-big text-white" aria-hidden="true"></i></div>
-                        <span class="counter-number text-white">Payout</span>
-                      </div>
-                    </div>
-                </a>
-            </div>-->
-
-            {{-- @endif --}}
-
 
           @else
 
@@ -456,58 +380,58 @@
 
 <script>
 $(window).on('load', function() {
-    $.ajax({
-        url: '/get-servers-and-stores',
-        type: 'GET',
-        data: {
-            _token: '{{ csrf_token() }}'
-        },
-    }).done(function (response) {
-        console.log(response);
+    // $.ajax({
+    //     url: '/get-servers-and-stores',
+    //     type: 'GET',
+    //     data: {
+    //         _token: '{{ csrf_token() }}'
+    //     },
+    // }).done(function (response) {
+    //     console.log(response);
         
-        for (var i = 0; i < response.length; i++) {
-          var server = response[i];
-          console.log(server[2]);
-          if(server[3]){
-            var button_text = "Shop";
-            var button_link = "/shop/" + server[3];
-            var button_class = "btn-success btn-outline";
-            if(!server[6]) {
-              button_text = "Add Bot";
-              button_link = "{{ 'https://discordapp.com/oauth2/authorize?client_id=' . env('DISCORD_CLIENT_ID') . '&scope=bot&permissions=' . env('DISCORD_BOT_PERMISSIONS') }}";
-              button_class = "btn-primary btn-outline";
-            }
-          }else{
-            var button_text = "Invite";
-            var button_link = "#";
-            var button_class = "btn-primary btn-outline";
-          }
-          if(server[2]){
-            var image_url = "https://cdn.discordapp.com/icons/"+server[0]+"/"+server[2]+".png?size=256";
-          }else{
-            var image_url = "https://i.imgur.com/qbVxZbJ.png";
-          }
-          var html = `
-          <li class="list-group-item px-5">
-             <div class="d-flex align-items-start">
-               <div class="pl-2 pr-10">
-                 <a class="avatar avatar-lg" href="${button_link}">
-                   <img class="img-fluid" src="${image_url}" alt="${server[1]}">
-                 </a>
-               </div>
-               <div class="media-body">
-                 <h5 class="mt-5 mb-5">${server[1]}</h5>
-                 <small>${server[5]}</small>
-               </div>
-               <div class="pl-5">
-                 <a href="${button_link}" class="btn ${button_class} mt-5">${button_text}</a>
-               </div>
-             </div>
-           </li>`
-           $('#guilds-dropdown').append(html);
-        }
+    //     for (var i = 0; i < response.length; i++) {
+    //       var server = response[i];
+    //       console.log(server[2]);
+    //       if(server[3]){
+    //         var button_text = "Shop";
+    //         var button_link = "/shop/" + server[3];
+    //         var button_class = "btn-success btn-outline";
+    //         if(!server[6]) {
+    //           button_text = "Add Bot";
+    //           button_link = "{{ 'https://discordapp.com/oauth2/authorize?client_id=' . env('DISCORD_CLIENT_ID') . '&scope=bot&permissions=' . env('DISCORD_BOT_PERMISSIONS') }}";
+    //           button_class = "btn-primary btn-outline";
+    //         }
+    //       }else{
+    //         var button_text = "Invite";
+    //         var button_link = "#";
+    //         var button_class = "btn-primary btn-outline";
+    //       }
+    //       if(server[2]){
+    //         var image_url = "https://cdn.discordapp.com/icons/"+server[0]+"/"+server[2]+".png?size=256";
+    //       }else{
+    //         var image_url = "https://i.imgur.com/qbVxZbJ.png";
+    //       }
+    //       var html = `
+    //       <li class="list-group-item px-5">
+    //          <div class="d-flex align-items-start">
+    //            <div class="pl-2 pr-10">
+    //              <a class="avatar avatar-lg" href="${button_link}">
+    //                <img class="img-fluid" src="${image_url}" alt="${server[1]}">
+    //              </a>
+    //            </div>
+    //            <div class="media-body">
+    //              <h5 class="mt-5 mb-5">${server[1]}</h5>
+    //              <small>${server[5]}</small>
+    //            </div>
+    //            <div class="pl-5">
+    //              <a href="${button_link}" class="btn ${button_class} mt-5">${button_text}</a>
+    //            </div>
+    //          </div>
+    //        </li>`
+    //        $('#guilds-dropdown').append(html);
+    //     }
 
-    })
+    // })
 });
 </script>
 

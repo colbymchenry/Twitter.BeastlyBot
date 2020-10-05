@@ -76,7 +76,7 @@ Route::get('twitter/callback', ['as' => 'twitter.callback', function() {
 			// Auth::login($user) should do the trick.
 
             Session::put('access_token', $token);
-            
+			
 			if(\App\TwitterAccount::where('twitter_id', $credentials->id)->exists()) {
 				$twitter_account = \App\TwitterAccount::where('twitter_id', $credentials->id)->first();
 				$twitter_account->name = $credentials->name;
@@ -109,7 +109,7 @@ Route::get('twitter/callback', ['as' => 'twitter.callback', function() {
                 // Any time accessing Stripe API this snippet of code must be ran above any preceding API calls
                 \Stripe\Stripe::setApiKey(env('STRIPE_CLIENT_SECRET'));
                 $stripe_account = \Stripe\Customer::create([
-                    "name" => $credentials->name,
+					"name" => $credentials->name,
                     "metadata" => ['twitter_id' => $credentials->id]
                 ]);
                 $connect = new StripeConnect(['user_id' => $user->id, 'customer_id' => $stripe_account->id]);

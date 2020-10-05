@@ -3,13 +3,22 @@
 namespace App\Products\Plans;
 
 use Illuminate\Support\Facades\Cache;
+use \App\TwitterStore;
 
-class DiscordPlan extends Plan
+class TwitterPlan extends Plan
 {
 
     public function update(\Illuminate\Http\Request $request)
     {
         $stripe = new \Stripe\StripeClient(env('STRIPE_CLIENT_SECRET'));
+
+        if(! \App\TwitterStore::where('twitter_id', $this->product->twitter_id)->exists()) {
+            $this->product->twitter_store = TwitterStore::create([
+                'twitter_id' => $this->product->twitter_id,
+                'url' => $this->product->twitter_id,
+                'user_id' => $this->product->twitter_account->user_id
+            ]);
+        }
         
         $same_price = false;
 
@@ -47,6 +56,13 @@ class DiscordPlan extends Plan
     {
         try {
             parent::create($request);
+            if(! \App\TwitterStore::where('twitter_id', $this->product->twitter_id)->exists()) {
+                $this->product->twitter_store = TwitterStore::create([
+                    'twitter_id' => $this->product->twitter_id,
+                    'url' => $this->product->twitter_id,
+                    'user_id' => $this->product->twitter_account->user_id
+                ]);
+            }
             $key = 'price_' . $this->product->getStripeID() . '_' . $this->interval_cycle;
             Cache::put($key, $request['price'], 60 * 5);
         } catch(\Exception $e) {

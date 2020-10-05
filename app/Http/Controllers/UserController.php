@@ -650,27 +650,6 @@ class UserController extends Controller {
         return response()->json(['success' => true]);
     }
 
-    public function getServersAndStores(){
-        $discord_o_auth = DiscordOAuth::where('user_id', auth()->user()->id)->first();
-        $discord_helper = auth()->user()->getTwitterHelper();
-
-        if($discord_helper->getGuilds()) {
-            $serversstores = array(); 
-            foreach($discord_helper->getGuilds() as $server) {
-                $shop = DiscordStore::where('guild_id', $server['id'])->first();
-
-                if($shop) {
-                    $serverstore = ["" . $server['id'], $server['name'], $server['icon'], $shop->url, $shop->live, $server['owner'] ? "Owner" : "Member", $discord_helper->guildHasBot($server['id'])]; // server id, name, icon, shop, live, joined
-                } else { 
-                    $serverstore = ["" . $server['id'], $server['name'], $server['icon'], false, false, $server['owner'] ? "Owner" : "Member", $discord_helper->guildHasBot($server['id'])]; 
-                }
-                array_push($serversstores, $serverstore);
-            }
-            return $serversstores;
-            
-        }
-    }
-
     public function impersonate($id)
     {       
         if(Auth::user()->admin == 1){

@@ -22,6 +22,7 @@ class CreateTwitterAccountsTable extends Migration
             $table->string('screen_name');
             $table->string('oauth_token');
             $table->string('oauth_token_secret');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

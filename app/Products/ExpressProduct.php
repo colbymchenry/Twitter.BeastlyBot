@@ -43,7 +43,7 @@ class ExpressProduct extends Product
          if ($stripe_helper->hasExpressPlan()) 
             throw new ProductMsgException('You already have an active live plan.');
          // this is pretty useless, but it's making sure they have a valid stripe Customer account with us, not Express. That way we can bill their Customer account
-         if ($stripe_helper->getStripeEmail() == null) 
+         if (auth()->user()->StripeConnect()->customer_id == null) 
             throw new ProductMsgException('You do not have a linked stripe account.');
     }
     

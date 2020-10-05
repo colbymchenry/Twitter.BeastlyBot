@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\AlertHelper;
 
 use App\Order;
-use App\Products\DiscordRoleProduct;
+use App\Products\TwitterProduct;
 use App\Products\ExpressProduct;
 use App\Products\ProductMsgException;
 use App\Refund;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Stripe\Exception\InvalidRequestException;
 use App\User;
-use App\DiscordStore;
+use App\TwitterStore;
 use App\StripeConnect;
 use App\Ban;
 
@@ -30,8 +30,8 @@ class OrderController extends Controller {
 
         try {
             switch ($request['product_type']) {
-                case "discord":
-                    $product = new DiscordRoleProduct($request['guild_id'], $request['role_id'], $request['billing_cycle']);
+                case "twitter":
+                    $product = new TwitterProduct($request['twitter_id'], $request['billing_cycle']);
                 break;
                 case "express":
                     $product = new ExpressProduct($request['billing_cycle'] == '1' ? env('LIVE_MONTHLY_PLAN_ID') : env('LIVE_YEARLY_PLAN_ID'));
@@ -43,11 +43,6 @@ class OrderController extends Controller {
 
             if(auth()->user()->getStripeHelper()->isSubscribedToProduct($product->getStripeProduct()->id)) {
                 throw new ProductMsgException('You are already subscribed to that product.');
-            }
-
-            $discord_store = DiscordStore::where('guild_id', $request['guild_id'])->first();
-            if(Ban::where('user_id', auth()->user()->id)->where('active', 1)->where('type', 1)->where('discord_store_id', $discord_store->id)->exists() && auth()->user()->id != $discord_store->user_id){
-                throw new ProductMsgException('You are banned from purchasing products from this store.');
             }
 
             $product->checkoutValidate();
@@ -75,8 +70,8 @@ class OrderController extends Controller {
         ];
 
         if(!empty($request['coupon_code'])) {
-            if(DiscordStore::where('guild_id', $request['guild_id'])->exists()) {
-                $store = DiscordStore::where('guild_id', $request['guild_id'])->first();
+            if(TwitterStore::where('twitter_id', $request['twitter_id'])->exists()) {
+                $store = TwitterStore::where('twitter_id', $request['twitter_id'])->first();
                 $checkout_data['subscription_data']['coupon'] = $store->user_id . $request['coupon_code'];
             }
         }
@@ -103,8 +98,8 @@ class OrderController extends Controller {
 
         try {
             switch (\request('product_type')) {
-                case "discord":
-                    $product = new DiscordRoleProduct(\request('guild_id'), \request('role_id'), \request('billing_cycle'));
+                case "twitter":
+                    $product = new TwitterProduct(\request('twitter_id'), \request('billing_cycle'));
                 break;
                 case "express":
                     $product = new ExpressProduct(\request('plan_id'));

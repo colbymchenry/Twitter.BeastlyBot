@@ -15,15 +15,11 @@
 
         <div class="col-sm-2 col-4">
             <a class="avatar avatar-xxl" href="javascript:void(0)">
-                <img src="{{ $discord_helper->getAvatar() }}" alt="...">
+                <img src="{{ auth()->user()->getTwitterAccount()->profile_image }}" alt="...">
             </a>
         </div>
         <div class="col-sm-8 col-8">
-            <h1 class="pt-20" style="color: white;">{{ $discord_helper->getUsername() }}</h1>
-            <!-- <div class="badge badge-lg font-size-20" style="color: white;background-color: #{{ dechex($role->color) }};">
-                <i class="icon-discord mr-2" aria-hidden="true"></i> 
-                <span>{{ $role->name }}</span>
-            </div> -->
+            <h1 class="pt-20" style="color: white;">{{ auth()->user()->getTwitterAccount()->screen_name }}</h1>
         </div>
     </div>
 </header>
@@ -31,7 +27,7 @@
 
 <div class="row no-space" id="slider-div">
     <div class="col-md-12 text-center">
-        <div class="font-size-20 font-weight-400 text-white pt-20 pt-lg-50">Subscribe to <span class="badge font-size-20 ml-2" style="color: white;background-color: #{{ dechex($role->color) }};"><i class="icon-discord mr-2" aria-hidden="true"></i> <span>{{ $role->name }}</span>
+        <div class="font-size-20 font-weight-400 text-white pt-20 pt-lg-50">Subscribe to <span class="badge font-size-20 ml-2" style="color: white;background-color: #00acee;"><i class="icon-twitter mr-2" aria-hidden="true"></i> <span>{{ $twitter_account->screen_name }}</span>
         </span>
 
     </div>
@@ -90,7 +86,7 @@
                 <div class="container">
                     <div class="row">
                         <br/>
-                        @if(($discord_helper->ownsGuild($store->guild_id)) && (!auth()->user()->canAcceptPayments()))
+                        @if($twitter_account->twitter_id == auth()->user()->getTwitterAccount()->twitter_id && ! auth()->user()->canAcceptPayments())
                         <a href="javascript:void(0)" class="btn btn-success btn-lg btn-block" data-toggle="modal" data-target="#partnerPricingModal"
                            role="button">Pay</a>
                         @else
@@ -120,7 +116,7 @@
 <script type="text/javascript">
     var token = '{{ csrf_token() }}';
     var current_price, net_price;
-    var is_member = '{{ $discord_helper->isMember($guild->id, $discord_helper->getID()) ? "true" : "false" }}';
+    var is_member = "false";
 
     if(is_member == "true") {
         is_member = true;
@@ -157,7 +153,7 @@
                 url: '/validate-coupon',
                 type: 'POST',
                 data: {
-                    owner_id: '{{ $guild->owner_id }}',
+                    owner_id: '{{ $twitter_account->user_id }}',
                     code: $input.val(),
                     _token: '{{ csrf_token() }}'
                 },
@@ -232,18 +228,6 @@
     }
 
     function beginCheckout() {
-        if(!is_member) {
-            Swal.fire({
-                title: 'Not a member!',
-                text: 'Please join the server before purchasing any roles.',
-                type: 'warning',
-                showCancelButton: false,
-                showConfirmButton: true,
-                allowOutsideClick: () => false,
-                target: document.getElementById('slider-div')
-            });
-            return;
-        }
         Swal.fire({
             title: 'Processing...',
             text: '',
@@ -261,14 +245,10 @@
             url: process_url,
             type: 'POST',
             data: {
-                'guild_id': '{{ $store->guild_id }}',
-                'role_id': '{{ $role->id }}',
-                'product_type': 'discord',
+                'twitter_id': '{{ $twitter_account->twitter_id }}',
+                'product_type': 'twitter',
                 'billing_cycle': getSelectedDuration(),
                 'coupon_code': $('#couponCode').val(),
-                //'server_icon': $('#guild_icon').attr('src'),
-                //'guild_name': '{{ $guild->name }}',
-                //'role_name': '{{ $role->name }}',
                 _token: '{{ csrf_token() }}'
             },
         }).done(function (msg) {
