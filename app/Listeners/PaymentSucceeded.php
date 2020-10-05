@@ -65,14 +65,6 @@ class PaymentSucceeded implements ShouldQueue
                         \Twitter::reconfig($request_token);
                         \Twitter::postFollow(['user_id' => $partner_twitter_id]);
 
-                        $request_token = [
-                            'token'  => $partner_oauth->oauth_token,
-                            'secret' => $partner_oauth->oauth_token_secret,
-                        ];
-                
-                        \Twitter::reconfig($request_token);
-                        \Twitter::postFollow(['user_id' => $customer_twitter_id]);
-
                         $subscription = new Subscription();
                         $subscription->id = $subscription_id;
                         $subscription->stripe_connect_id = StripeConnect::where('user_id', $partner_id)->first()->id;
