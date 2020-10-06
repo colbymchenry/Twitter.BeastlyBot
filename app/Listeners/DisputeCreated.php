@@ -5,11 +5,11 @@ namespace App\Listeners;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Spatie\WebhookClient\Models\WebhookCall;
 use \App\StripeConnect;
-use \App\DiscordOAuth;
+use \App\TwitterAccount;
 use \App\NewSubscription;
 
 use \App\ScheduledInvoicePayout;
-use \App\DiscordStore;
+use \App\TwitterStore;
 use \App\Subscription;
 use \App\Stat;
 use \App\Dispute;
@@ -117,7 +117,7 @@ class DisputeCreated implements ShouldQueue
         $charge_last4 = $charge['payment_method_details']['card']['last4'];
 
         $subscription = Subscription::where('id', $invoice_product_subscription)->first();
-        $shop = DiscordStore::where('id', $subscription->store_id)->first();
+        $shop = TwitterStore::where('id', $subscription->store_id)->first();
 
         if($shop->level < 10){
             $shop->level = $shop->level + 1;
@@ -143,7 +143,7 @@ class DisputeCreated implements ShouldQueue
             $subscription_refund_terms = "Refunds not accepted. Purchase with trust in Shop Owner.";
         }
 
-        $discord_o_auth = DiscordOAuth::where('user_id', $subscription->user_id)->first();
+        $twitter_account = TwitterAccount::where('user_id', $subscription->user_id)->first();
         
         $dispute_id = $webhookCall->payload['data']['object']['id']; // "dp_
         
@@ -162,7 +162,7 @@ class DisputeCreated implements ShouldQueue
         $stripe->disputes->update(
             $dispute_id,
             ['metadata' => ['evidence_submitted' => '1'],
-            'evidence' => ['uncategorized_text'=>'We have happily contacted the payer to understand and resolve the problem.', /*'customer_signature' => $discord_o_auth->access_token, */'access_activity_log' => 'Updated at: ' . $discord_o_auth->updated_at . ' Created at: ' . $discord_o_auth->created_at . ' Discord ID: ' . $discord_o_auth->discord_id . 'Access by: Discord User Login', 'billing_address' => $charge_name . ' ' . $charge_postal_code . ' ' . $charge_country, 'customer_name' => $charge_name, 'customer_email_address' => $charge_email, 'product_description' => $invoice_product_description . ' on Discord Server ' . $shop->url . ', (' . $shop->description . ')', /*'receipt' => $invoice_pdf, */'refund_policy_disclosure' => 'Shop Purchase Terms: ' . $subscription_refund_terms, /*'refund_policy' => 'Company Terms: https://beastlybot.com/terms',*//* 'cancellation_policy' => 'Cancel anytime at https://beastlybot.com/account/subscriptions',*/ 'refund_refusal_explanation' => 'Refunds are allowed, explained and supported easily within purchase website.', 'service_date' => $subscription->updated_at, 'cancellation_rebuttal' => 'Subscription could be canceled any time and could be fully refunded within '. $subscription->refund_days . ' days as noted on checkout. Subscription now canceled due to dispute.'],
+            'evidence' => ['uncategorized_text'=>'We have happily contacted the payer to understand and resolve the problem.', /*'customer_signature' => $discord_o_auth->access_token, */'access_activity_log' => 'Updated at: ' . $twitter_account->updated_at . ' Created at: ' . $twitter_account->created_at . ' Twitter ID: ' . $twitter_account->twitter_id . 'Access by: Twitter User Login', 'billing_address' => $charge_name . ' ' . $charge_postal_code . ' ' . $charge_country, 'customer_name' => $charge_name, 'customer_email_address' => $charge_email, 'product_description' => $invoice_product_description . ' on Discord Server ' . $shop->url . ', (' . $shop->description . ')', /*'receipt' => $invoice_pdf, */'refund_policy_disclosure' => 'Shop Purchase Terms: ' . $subscription_refund_terms, /*'refund_policy' => 'Company Terms: https://beastlybot.com/terms',*//* 'cancellation_policy' => 'Cancel anytime at https://beastlybot.com/account/subscriptions',*/ 'refund_refusal_explanation' => 'Refunds are allowed, explained and supported easily within purchase website.', 'service_date' => $subscription->updated_at, 'cancellation_rebuttal' => 'Subscription could be canceled any time and could be fully refunded within '. $subscription->refund_days . ' days as noted on checkout. Subscription now canceled due to dispute.'],
             'submit' => true,
             ]
         );
@@ -174,10 +174,9 @@ class DisputeCreated implements ShouldQueue
 
         $ban = Ban::create([
             'user_id' =>  $subscription->user_id, 
-            'discord_id' => $discord_o_auth->discord_id, 
+            'twitter_id' => $twitter_account->twitter_id, 
             'type' => 1, 
-            'discord_store_id' => $shop->id, 
-            'guild_id' => $shop->guild_id, 
+            'twitter_store_id' => $shop->id, 
             'until' => NULL, 
             'active' => 1, 
             'reason' => "Subscription Dispute Ban", 

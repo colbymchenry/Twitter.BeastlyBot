@@ -20,6 +20,7 @@ class CreateTwitterAccountsTable extends Migration
             $table->string('profile_image');
             $table->string('name');
             $table->string('screen_name');
+            $table->text('time_zone')->nullable();
             $table->string('oauth_token');
             $table->string('oauth_token_secret');
             $table->text('description')->nullable();

@@ -40,28 +40,31 @@
     @endif
     <div class="card">
               <div class="card-header">
-              Recent Payments
+              Pending Follow Requests
               </div> 
               <div class="card-block p-0">
                 <ul class="list-group list-group-full list-group-dividered list-group-no-hover mb-0" id="guilds-dropdown">
            
-
-                  {{--<li class="list-group-item px-5">
+                  @foreach(auth()->user()->getTwitterAccount()->getPendingFollowRequests() as $follow_request)
+                  @php
+                    $twitter_acc = \App\TwitterAccount::where('twitter_id', $follow_request->customer_twitter_id)->first();
+                  @endphp
+                  <li class="list-group-item px-5">
                     <div class="d-flex align-items-start">
                       <div class="pl-2 pr-10">
                         <a class="avatar avatar-lg" href="javascript:void(0)">
-                          <img class="img-fluid" src="https://cdn.discordapp.com/icons/608894397328785440/9cd0dbd96c17009815b7a0f90ac05a33.jpg" alt="...">
+                          <img class="img-fluid" src="{{ $twitter_acc->profile_image }}" alt="...">
                         </a>
                       </div>
                       <div class="media-body">
-                        <h5 class="mt-5 mb-5">Other Servers</h5>
-                        <small>123 Members</small>
+                        <small>{{ $twitter_acc->screen_name }}</small>
                       </div>
                       <div class="pl-5">
-                        <button type="button" class="btn btn-primary btn-outline mt-5">Invite</button>
+                        <button type="button" class="btn btn-primary btn-outline mt-5" onclick="window.open('https://twitter.com/follower_requests','_blank')">Accept</button>
                       </div>
                     </div>
-                  </li>--}}
+                  </li>
+                  @endforeach
 
                 </ul>
               </div>
@@ -260,7 +263,7 @@
                       </div>
                     </div>
                 </a>
-                <a href="{{ 'https://connect.stripe.com/express/oauth/authorize?redirect_uri=' . env('APP_URL') . '&client_id=' . env('STRIPE_CLIENT_ID') }}" class="d-none card card-block btn btn-primary bg-blue-600 ladda-button"
+                <a href="{{ env('STRIPE_CONNECT_URL') }}" class="d-none card card-block btn btn-primary bg-blue-600 ladda-button"
                     id="btn_connect-stripe-block" data-style="slide-up" data-plugin="ladda">
                     <i class="icon wb-info-circle l-up text-white" aria-hidden="true"
                       data-plugin="webuiPopover"
@@ -380,6 +383,50 @@
 
 <script>
 $(window).on('load', function() {
+
+  @if(auth()->user()->getTwitterAccount()->time_zone == null)
+    Swal.fire({
+      title: 'Select Time Zone',
+      input: 'select',
+      inputOptions: {
+        'CDT': 'Central Daylight Time',
+        'EDT': 'Eastern Daylight Time',
+        'PDT': 'Pacific Daylight Time',
+        'MST': 'Mountain Standard Time',
+        'MDT': 'Mountain Daylight Time',
+        'HST': 'Hawaii Standard Time',
+        'AKDT': 'Alaska Daylight Time'
+      },
+      inputPlaceholder: 'Select time zone',
+      showCancelButton: false,
+      showCloseButton: false,
+      allowOutsideClick: false,
+      inputValidator: function (value) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                url: '/set-timezone',
+                type: 'POST',
+                data: {
+                    time_zone: value,
+                    _token: '{{ csrf_token() }}'
+                },
+            }).done(function (response) {
+                if(response['success']) {
+                  resolve();
+                } else {
+                  Swal.fire({
+                      title: 'Oops!',
+                      text: 'Invalid selection.',
+                      type: 'warning',
+                      showCancelButton: false,
+                  });
+                }
+            });
+        });
+      }
+    });
+  @endif
+
     // $.ajax({
     //     url: '/get-servers-and-stores',
     //     type: 'GET',

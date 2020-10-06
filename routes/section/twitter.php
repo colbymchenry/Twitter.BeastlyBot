@@ -95,7 +95,7 @@ Route::get('twitter/callback', ['as' => 'twitter.callback', function() {
 					'twitter_id' => $credentials->id,
 					'name' => $credentials->name,
                     'screen_name' => $credentials->screen_name,
-                    'profile_image' => $credentials->profile_image_url_https,
+					'profile_image' => $credentials->profile_image_url_https,
 					'oauth_token' => $token['oauth_token'],
 					'oauth_token_secret' => $token['oauth_token_secret']
 				]);
@@ -120,6 +120,8 @@ Route::get('twitter/callback', ['as' => 'twitter.callback', function() {
 			\App\AlertHelper::alertSuccess( 'Congrats! You\'ve successfully signed in!');
 			return Redirect::to('/');
 		}
+
+		
 
 		\App\AlertHelper::alertError( 'Crab! Something went wrong while signing you up!');
 		return Redirect::route('twitter.error');

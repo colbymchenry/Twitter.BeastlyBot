@@ -61,7 +61,7 @@ class DisputeClosed implements ShouldQueue
         }
 
         $subscription = Subscription::where('id', $invoice_product_subscription)->first();
-        $shop = DiscordStore::where('id', $subscription->store_id)->first();
+        $shop = TwitterStore::where('id', $subscription->store_id)->first();
 
         $stats = Stat::where('type', 1)->where('type_id', $shop->id)->first();
         $disputes_active = $stats->data['disputes']['active'];

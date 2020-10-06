@@ -10,6 +10,8 @@ class TwitterPlan extends Plan
 
     public function update(\Illuminate\Http\Request $request)
     {
+        $this->product->createProduct();
+
         $stripe = new \Stripe\StripeClient(env('STRIPE_CLIENT_SECRET'));
 
         if(! \App\TwitterStore::where('twitter_id', $this->product->twitter_id)->exists()) {
@@ -54,6 +56,8 @@ class TwitterPlan extends Plan
 
     public function create(\Illuminate\Http\Request $request)
     {
+        $this->product->createProduct();
+        
         try {
             parent::create($request);
             if(! \App\TwitterStore::where('twitter_id', $this->product->twitter_id)->exists()) {

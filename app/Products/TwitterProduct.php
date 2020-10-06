@@ -49,12 +49,7 @@ class TwitterProduct extends Product
     }
 
     public function create(Request $request) {
-        \Stripe\Product::create([
-            'name' => $this->twitter_account->screen_name,
-            'id' => $this->getStripeID(),
-            'type' => 'service',
-            'metadata' => ['user_id' => auth()->user()->id],
-        ]);
+        $this->createProduct();
 
         if($this->twitter_store == null) {
             $this->twitter_store = TwitterStore::create([
@@ -68,6 +63,8 @@ class TwitterProduct extends Product
     }
 
     public function update(Request $request) {
+        $this->createProduct();
+
         try {
             if($this->twitter_store == null) {
                 $this->twitter_store = TwitterStore::create([
@@ -118,6 +115,28 @@ class TwitterProduct extends Product
     public function getStripePlan() {
         \Stripe\Stripe::setApiKey(env('STRIPE_CLIENT_SECRET'));
         return \Stripe\Plan::retrieve($this->getStripeID() . '_' . $this->billing_cycle . '_r');
+    }
+
+
+    public function createProduct() {
+        if($this->getStripeProduct() == null) {
+            \Stripe\Stripe::setApiKey(env('STRIPE_CLIENT_SECRET'));
+            try {
+                $this->stripe_product_obj = \Stripe\Product::retrieve($this->getStripeID());
+                Cache::put('product_' . $this->getStripeID(), $this->stripe_product_obj, 60 * 10);
+            } catch (\Exception $e) {
+            }
+
+            if($this->stripe_product_obj == null) {
+                $this->stripe_product_obj = \Stripe\Product::create([
+                    'name' => $this->twitter_account->screen_name,
+                    'id' => $this->getStripeID(),
+                    'type' => 'service',
+                    'metadata' => ['user_id' => auth()->user()->id],
+                ]);
+                Cache::put('product_' . $this->getStripeID(), $this->stripe_product_obj, 60 * 10);
+            }
+        }
     }
 
 }

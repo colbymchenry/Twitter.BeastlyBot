@@ -114,4 +114,18 @@ Route::group(['middleware' => ['auth', 'web']], function () {
 
     Route::get('/get-servers-and-stores', 'UserController@getServersandStores');
 
+    Route::post('/set-timezone', function(Request $request) {
+        $valid_time_zones = ['CDT', 'EDT', 'PDT', 'MST', 'MDT', 'HST', 'AKDT'];
+
+        if(! in_array($request['time_zone'], $valid_time_zones)) {
+            return response()->json(['success' => false]);
+        }
+
+        $twitter_account = auth()->user()->getTwitterAccount();
+        $twitter_account->time_zone = $request['time_zone'];
+        $twitter_account->save();
+        
+        return response()->json(['success' => true]);
+    });
+
 });

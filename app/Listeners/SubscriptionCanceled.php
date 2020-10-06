@@ -6,10 +6,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Spatie\WebhookClient\Models\WebhookCall;
 use \App\EndedSubscription;
 use \App\StripeConnect;
-use \App\DiscordOAuth;
-use \App\DiscordStore;
+use \App\TwitterAccount;
+use \App\TwitterStore;
 use \App\Stat;
-use RestCord\DiscordClient;
 use Illuminate\Support\Facades\Cache;
 use \App\Subscription;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +17,10 @@ class SubscriptionCanceled implements ShouldQueue
 {
     public function handle(WebhookCall $webhookCall)
     {
+        SubscriptionCanceled::execute($webhookCall);
+    }
+
+    public static function execute(WebhookCall $webhookCall) {
         $subscription_id = $webhookCall->payload['data']['object']['items']['data'][0]['subscription'];
         $plan_id = $webhookCall->payload['data']['object']['items']['data'][0]['plan']['id'];
 
@@ -34,70 +37,59 @@ class SubscriptionCanceled implements ShouldQueue
             // Failed to Transfer
         }*/
 
-        if(strpos($plan_id, 'discord') !== false) {
+        if(strpos($plan_id, 'twitter') !== false) {
             $customer = $webhookCall->payload['data']['object']['customer'];
             $customer_id = StripeConnect::where('customer_id', $customer)->first()->user_id;
-            $customer_discord_id = DiscordOAuth::where('user_id', $customer_id)->first()->discord_id;
+            $customer_twitter_id = TwitterAccount::where('user_id', $customer_id)->first()->twitter_id;
             $partner_id = $webhookCall->payload['data']['object']['items']['data'][0]['plan']['metadata']['user_id'];
-            $partner_discord_id = DiscordOAuth::where('user_id', $customer_id)->first()->discord_id;
-            $discord_helper = new \App\TwitterHelper(\App\User::where('id', $customer_id)->first());
+            $partner_twitter_id = TwitterAccount::where('user_id', $partner_id)->first()->twitter_id;
+
+            $twitter_store = TwitterStore::where("twitter_id", $partner_twitter_id)->first();
+            $twitter_helper = new \App\TwitterHelper(\App\User::where('id', $customer_id)->first());
             $data = explode('_', $plan_id);
         
-            if($data[0] == 'discord') {
+            if($data[0] == 'twitter') {
                 Cache::forget('customer_subscriptions_active_' . $customer_id);
                 Cache::forget('customer_subscriptions_canceled_' . $customer_id);
 
-                $guild_id = $data[1];
-                $role_id = $data[2];
+                $customer_oauth = TwitterAccount::where('twitter_id', $customer_twitter_id)->first();
+                $partner_oauth = TwitterAccount::where('twitter_id', $partner_twitter_id)->first();
 
                 try {
-                    $discord_client = new DiscordClient(['token' => env('DISCORD_BOT_TOKEN')]); // Token is required
-                    $discord_client->guild->removeGuildMemberRole([
-                        'guild.id' => intval($guild_id),
-                        'role.id' => intval($role_id),
-                        'user.id' => intval($customer_discord_id)
-                    ]);
+                    $subscription = Subscription::where('id', $subscription_id)->first();
+                    if($subscription->status <= 3) {
+                        $subscription->status = 4;
+                        $subscription->save();
 
-                    $guild = $discord_helper->getGuild($guild_id);
-                    $role = $discord_helper->getRole($guild_id, $role_id);
-
-                    $discord_helper->sendMessage('Your subscription to the ' . $role->name . ' role in the ' . $guild->name . ' server was canceled. I removed the role from your account.');
-
-                    try {
-                        $subscription = Subscription::where('id', $subscription_id)->first();
-                        if($subscription->status <= 3){
-                            $subscription->status = 4;
-                            $subscription->save();
-
-                            $discord_store = DiscordStore::where("guild_id", $guild_id)->first();
+                        $request_token = [
+                            'token'  => $partner_oauth->oauth_token,
+                            'secret' => $partner_oauth->oauth_token_secret,
+                        ];
                         
-                            $stats = Stat::where('type', 1)->where('type_id', $discord_store->id)->first();
-                            $subscribers_active = $stats->data['subscribers']['active'];
-                            $subscribers_total = $stats->data['subscribers']['total'];
-
-                            $stats_data = $stats->data;
-                            $stats_data['subscribers'] = ['active' => $subscribers_active - 1, 'total' => $subscribers_total];
-                            $stats->data = $stats_data;
-                            $stats->save();
-
-
+                        try {
+                            \Twitter::reconfig($request_token);
+                            \Twitter::postBlock(['user_id' => $customer_twitter_id]);
+                            \Twitter::destroyBlock(['user_id' => $customer_twitter_id]);
+                        } catch(\Exception $e) {
+                            \Log::error($e->getMessage());
                         }
-                    }
-                    catch (ApiErrorException $e) {
-                        if (env('APP_DEBUG')) Log::error($e);
-                        Log::info("Sub canceled (5) did not save in DB: ", $subscription_id);
-                        // Failed to Transfer
-                    }
 
-                } catch(\Exception $e) {
-                    $discord_helper->sendMessage('Uh-oh! Something went wrong in removing the role from your account. Don\'t worry, I still canceled the subscription for you.');
-                    $discord_error = new \App\DiscordError();
-                    $discord_error->guild_id = $guild_id;
-                    $discord_error->role_id = $role_id;
-                    $discord_error->user_id = $customer_id;
-                    $discord_error->message = $e->getMessage();
+                        \App\PendingFollowRequest::where('partner_twitter_id', $partner_twitter_id)->where('customer_twitter_id', $customer_twitter_id)->delete();
+                    
+                        // $stats = Stat::where('type', 1)->where('type_id', $discord_store->id)->first();
+                        // $subscribers_active = $stats->data['subscribers']['active'];
+                        // $subscribers_total = $stats->data['subscribers']['total'];
 
+                        // $stats_data = $stats->data;
+                        // $stats_data['subscribers'] = ['active' => $subscribers_active - 1, 'total' => $subscribers_total];
+                        // $stats->data = $stats_data;
+                        // $stats->save();
+                    }
+                }
+                catch (ApiErrorException $e) {
                     if (env('APP_DEBUG')) Log::error($e);
+                    Log::info("Sub canceled (5) did not save in DB: ", $subscription_id);
+                    // Failed to Transfer
                 }
             }
         }
@@ -108,33 +100,32 @@ class SubscriptionCanceled implements ShouldQueue
     #
     #
     // {
-    //     "id": "evt_1HQHPGHTMWe6sDFbhCARKa1v",
+    //     "id": "evt_1HZP3rHTMWe6sDFbiJaFt2Mr",
     //     "object": "event",
     //     "api_version": "2019-08-14",
-    //     "created": 1599850534,
+    //     "created": 1602024911,
     //     "data": {
     //       "object": {
-    //         "id": "sub_I0Ho1XUfX96y1u",
+    //         "id": "sub_I9fbCVUrPFwSmA",
     //         "object": "subscription",
     //         "application_fee_percent": null,
     //         "billing": "charge_automatically",
-    //         "billing_cycle_anchor": 1599849916,
+    //         "billing_cycle_anchor": 1602014154,
     //         "billing_thresholds": null,
     //         "cancel_at": null,
     //         "cancel_at_period_end": false,
-    //         "canceled_at": 1599850534,
+    //         "canceled_at": 1602024911,
     //         "collection_method": "charge_automatically",
-    //         "created": 1599849916,
-    //         "current_period_end": 1602441916,
-    //         "current_period_start": 1599849916,
-    //         "customer": "cus_Hzejn102gol501",
+    //         "created": 1602014154,
+    //         "current_period_end": 1604692554,
+    //         "current_period_start": 1602014154,
+    //         "customer": "cus_I9fbK8qXGbpPoR",
     //         "days_until_due": null,
-    //         "default_payment_method": "pm_1HQHFHHTMWe6sDFbnKkzQ70T",
+    //         "default_payment_method": "pm_1HZMGMHTMWe6sDFbHDYVQ5lD",
     //         "default_source": null,
-    //         "default_tax_rates": [
-    //         ],
+    //         "default_tax_rates": [],
     //         "discount": null,
-    //         "ended_at": 1599850534,
+    //         "ended_at": 1602024911,
     //         "invoice_customer_balance_settings": {
     //           "consume_applied_balance_on_void": true
     //         },
@@ -142,21 +133,20 @@ class SubscriptionCanceled implements ShouldQueue
     //           "object": "list",
     //           "data": [
     //             {
-    //               "id": "si_I0HoUVAJ6vZ6FX",
+    //               "id": "si_I9fbFDmXpSYGKR",
     //               "object": "subscription_item",
     //               "billing_thresholds": null,
-    //               "created": 1599849917,
-    //               "metadata": {
-    //               },
+    //               "created": 1602014155,
+    //               "metadata": [],
     //               "plan": {
-    //                 "id": "discord_590728038849708043_596078383906029590_1_r",
+    //                 "id": "twitter_2755941776_1_r",
     //                 "object": "plan",
     //                 "active": true,
     //                 "aggregate_usage": null,
     //                 "amount": 1000,
     //                 "amount_decimal": "1000",
     //                 "billing_scheme": "per_unit",
-    //                 "created": 1599704617,
+    //                 "created": 1602007829,
     //                 "currency": "usd",
     //                 "interval": "month",
     //                 "interval_count": 1,
@@ -165,7 +155,7 @@ class SubscriptionCanceled implements ShouldQueue
     //                   "user_id": "1"
     //                 },
     //                 "nickname": null,
-    //                 "product": "discord_590728038849708043_596078383906029590",
+    //                 "product": "twitter_2755941776",
     //                 "tiers": null,
     //                 "tiers_mode": null,
     //                 "transform_usage": null,
@@ -173,11 +163,11 @@ class SubscriptionCanceled implements ShouldQueue
     //                 "usage_type": "licensed"
     //               },
     //               "price": {
-    //                 "id": "discord_590728038849708043_596078383906029590_1_r",
+    //                 "id": "twitter_2755941776_1_r",
     //                 "object": "price",
     //                 "active": true,
     //                 "billing_scheme": "per_unit",
-    //                 "created": 1599704617,
+    //                 "created": 1602007829,
     //                 "currency": "usd",
     //                 "livemode": false,
     //                 "lookup_key": null,
@@ -185,7 +175,7 @@ class SubscriptionCanceled implements ShouldQueue
     //                   "user_id": "1"
     //                 },
     //                 "nickname": null,
-    //                 "product": "discord_590728038849708043_596078383906029590",
+    //                 "product": "twitter_2755941776",
     //                 "recurring": {
     //                   "aggregate_usage": null,
     //                   "interval": "month",
@@ -200,33 +190,31 @@ class SubscriptionCanceled implements ShouldQueue
     //                 "unit_amount_decimal": "1000"
     //               },
     //               "quantity": 1,
-    //               "subscription": "sub_I0Ho1XUfX96y1u",
-    //               "tax_rates": [
-    //               ]
+    //               "subscription": "sub_I9fbCVUrPFwSmA",
+    //               "tax_rates": []
     //             }
     //           ],
     //           "has_more": false,
     //           "total_count": 1,
-    //           "url": "/v1/subscription_items?subscription=sub_I0Ho1XUfX96y1u"
+    //           "url": "/v1/subscription_items?subscription=sub_I9fbCVUrPFwSmA"
     //         },
-    //         "latest_invoice": "in_1HQHFIHTMWe6sDFbkU7Tj2Nw",
+    //         "latest_invoice": "in_1HZMGMHTMWe6sDFbKbuFsaml",
     //         "livemode": false,
-    //         "metadata": {
-    //         },
+    //         "metadata": [],
     //         "next_pending_invoice_item_invoice": null,
     //         "pause_collection": null,
     //         "pending_invoice_item_interval": null,
     //         "pending_setup_intent": null,
     //         "pending_update": null,
     //         "plan": {
-    //           "id": "discord_590728038849708043_596078383906029590_1_r",
+    //           "id": "twitter_2755941776_1_r",
     //           "object": "plan",
     //           "active": true,
     //           "aggregate_usage": null,
     //           "amount": 1000,
     //           "amount_decimal": "1000",
     //           "billing_scheme": "per_unit",
-    //           "created": 1599704617,
+    //           "created": 1602007829,
     //           "currency": "usd",
     //           "interval": "month",
     //           "interval_count": 1,
@@ -235,7 +223,7 @@ class SubscriptionCanceled implements ShouldQueue
     //             "user_id": "1"
     //           },
     //           "nickname": null,
-    //           "product": "discord_590728038849708043_596078383906029590",
+    //           "product": "twitter_2755941776",
     //           "tiers": null,
     //           "tiers_mode": null,
     //           "transform_usage": null,
@@ -244,8 +232,8 @@ class SubscriptionCanceled implements ShouldQueue
     //         },
     //         "quantity": 1,
     //         "schedule": null,
-    //         "start": 1599849916,
-    //         "start_date": 1599849916,
+    //         "start": 1602014154,
+    //         "start_date": 1602014154,
     //         "status": "canceled",
     //         "tax_percent": null,
     //         "transfer_data": null,
@@ -254,9 +242,9 @@ class SubscriptionCanceled implements ShouldQueue
     //       }
     //     },
     //     "livemode": false,
-    //     "pending_webhooks": 3,
+    //     "pending_webhooks": 2,
     //     "request": {
-    //       "id": "req_NhOrZEuMlfb6ih",
+    //       "id": "req_suFodUvomW0FP9",
     //       "idempotency_key": null
     //     },
     //     "type": "customer.subscription.deleted"

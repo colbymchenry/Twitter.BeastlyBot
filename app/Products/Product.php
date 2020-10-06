@@ -10,7 +10,7 @@ abstract class Product
 {
   
     protected $product_type;
-    protected $stripe_product_obj;
+    public $stripe_product_obj;
 
     public function __construct(string $product_type)
     {

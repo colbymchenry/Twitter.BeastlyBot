@@ -25,7 +25,7 @@
           </div>
         </form>-->
         <form>
-        <button type="button" class="btn btn-lg btn-tagged social-discord ladda-button" data-style="slide-up" data-plugin="ladda"
+        <button id="btn-login" type="button" class="btn btn-lg btn-tagged social-discord ladda-button" data-style="slide-up" data-plugin="ladda"
         onclick="window.location.href='{{ route('twitter.login') }}'">
             <span class="btn-tag"><i class="icon icon-twitter" aria-hidden="true"></i></span>
             <span class="ladda-label">Login with Twitter</span>

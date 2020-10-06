@@ -76,7 +76,7 @@
                                         <a href="/dashboard"
                                            class="btn-common mt-sm-25">Go to dashboard</a>
                                     @else
-                                        <a href="{{ route('twitter.login') }}"
+                                        <a id="a-login" href="{{ route('twitter.login') }}"
                                            class="btn-common mt-sm-25">Login with Twitter</a>
                                     @endauth
                                 </div>

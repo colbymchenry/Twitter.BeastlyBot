@@ -200,7 +200,7 @@
                                 <i class="icon-twitter"></i>
                                 Dash<span class="ds-sm-none">board</span></a>
                             {{--@else
-                                <a href="{{ route('twitter.login') }}">
+                                <a id="a-login" href="{{ route('twitter.login') }}">
                                 <i class="icon-twitter"></i> Login<span
                                         class="ds-sm-none"> with Twitter</span></a>
                             @endauth--}}
@@ -321,6 +321,7 @@
     </div>
 </footer>
 <!--footer ends-->
+
 
 <!-- modernizr js -->
 <script src="{{ asset('site/assets/js/vendor/modernizr-3.6.0.min.js') }}"></script>

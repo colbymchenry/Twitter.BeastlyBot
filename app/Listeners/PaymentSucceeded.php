@@ -19,7 +19,6 @@ class PaymentSucceeded implements ShouldQueue
 {
     public function handle(WebhookCall $webhookCall)
     {
-        \Log::info(json_encode($webhookCall->payload));
         $reason = $webhookCall->payload['data']['object']['billing_reason'];
         $plan_id = $webhookCall->payload['data']['object']['lines']['data'][0]['plan']['id'];
         $paid = $webhookCall->payload['data']['object']['paid'];
@@ -27,7 +26,7 @@ class PaymentSucceeded implements ShouldQueue
         if($paid && strpos($plan_id, '_') !== false) {
             $subscription_id = $webhookCall->payload['data']['object']['lines']['data'][0]['subscription'];
             $data = explode('_', $plan_id);
-            
+
             if($data[0] == 'twitter') {
                 $customer = $webhookCall->payload['data']['object']['customer'];
                 $customer_id = StripeConnect::where('customer_id', $customer)->first()->user_id;
@@ -56,69 +55,86 @@ class PaymentSucceeded implements ShouldQueue
 
                     $customer_oauth = TwitterAccount::where('twitter_id', $customer_twitter_id)->first();
                     $partner_oauth = TwitterAccount::where('twitter_id', $partner_twitter_id)->first();
+                   
                     try {
                         $request_token = [
                             'token'  => $customer_oauth->oauth_token,
                             'secret' => $customer_oauth->oauth_token_secret,
                         ];
                 
+                        try {
+                            \Twitter::reconfig($request_token);
+                            \Twitter::postFollow(['user_id' => $partner_twitter_id]);
+                        } catch(\Exception $e) {
+                            \Log::error($e->getMessage());
+                        }
+
+                        $settings = \Twitter::getSettings();
+
+                        $request_token = [
+                            'token'  => $partner_oauth->oauth_token,
+                            'secret' => $partner_oauth->oauth_token_secret,
+                        ];
+                        
                         \Twitter::reconfig($request_token);
-                        \Twitter::postFollow(['user_id' => $partner_twitter_id]);
+                        $settings = \Twitter::getSettings();
 
-                        $subscription = new Subscription();
-                        $subscription->id = $subscription_id;
-                        $subscription->stripe_connect_id = StripeConnect::where('user_id', $partner_id)->first()->id;
-                        $subscription->latest_invoice_id = $webhookCall->payload['data']['object']['id'];
-                        $subscription->latest_invoice_paid_at = date('Y-m-d H:i:s');
-                        $subscription->latest_invoice_amount = $webhookCall->payload['data']['object']['amount_paid'];
-                        $subscription->connection_type = 1;
-                        $subscription->connection_id = TwitterAccount::where('user_id', $partner_id)->first()->id;
-                        $subscription->store_id = $twitter_store->id;
-                        $subscription->product_id = $webhookCall->payload['data']['object']['lines']['data'][0]['plan']['product'];
-                        $subscription->refund_enabled = $twitter_store->refunds_enabled;
-                        $subscription->refund_days = $twitter_store->refunds_days;
-                        $subscription->refund_terms = $twitter_store->refunds_terms;
-                        $subscription->status = 1;
-                        $subscription->metadata = [];
-                        $subscription->level = $level;
-                        $subscription->user_id = $customer_id;
-                        $subscription->partner_id = $partner_id;
-                        $subscription->current_period_end = date("Y-m-d", $webhookCall->payload['data']['object']['lines']['data'][0]['period']['end']);
-                        $subscription->save();
+                        if($settings->protected) {
+                            if(! \App\PendingFollowRequest::where('partner_twitter_id', $partner_twitter_id)->where('customer_twitter_id', $customer_twitter_id)->exists()) {
+                                \App\PendingFollowRequest::create([
+                                    'partner_twitter_id' => $partner_twitter_id,
+                                    'customer_twitter_id' => $customer_twitter_id
+                                ]);
+                            }
+                        }
 
-                        // $stats = Stat::where('type', 1)->where('type_id', $twitter_store->id)->first();                            
-                        // $stats_data = $stats->data;
-                        // $stats_data['subscribers'] = ['active' => $subscribers_active + 1, 'total' => $subscribers_total + 1];
-                        // $stats->data = $stats_data;
-                        // $stats->save();
+                        if(! Subscription::where('id', $subscription_id)->exists()) {
+                            $subscription = new Subscription();
+                            $subscription->id = $subscription_id;
+                            $subscription->stripe_connect_id = StripeConnect::where('user_id', $partner_id)->first()->id;
+                            $subscription->latest_invoice_id = $webhookCall->payload['data']['object']['id'];
+                            $subscription->latest_invoice_paid_at = date('Y-m-d H:i:s');
+                            $subscription->latest_invoice_amount = $webhookCall->payload['data']['object']['amount_paid'];
+                            $subscription->connection_type = 1;
+                            $subscription->connection_id = TwitterAccount::where('user_id', $partner_id)->first()->id;
+                            $subscription->store_id = $twitter_store->id;
+                            $subscription->product_id = $webhookCall->payload['data']['object']['lines']['data'][0]['plan']['product'];
+                            $subscription->refund_enabled = $twitter_store->refunds_enabled;
+                            $subscription->refund_days = $twitter_store->refunds_days;
+                            $subscription->refund_terms = $twitter_store->refunds_terms;
+                            $subscription->status = 1;
+                            $subscription->metadata = [];
+                            $subscription->level = $level;
+                            $subscription->user_id = $customer_id;
+                            $subscription->partner_id = $partner_id;
+                            $subscription->current_period_end = date("Y-m-d", $webhookCall->payload['data']['object']['lines']['data'][0]['period']['end']);
+                            $subscription->save();
+
+                            // $stats = Stat::where('type', 1)->where('type_id', $twitter_store->id)->first();                            
+                            // $stats_data = $stats->data;
+                            // $stats_data['subscribers'] = ['active' => $subscribers_active + 1, 'total' => $subscribers_total + 1];
+                            // $stats->data = $stats_data;
+                            // $stats->save();
+                        }
 
                     } catch(\Exception $e) {
+                        $this->cancelRefund($webhookCall);
                         if (env('APP_DEBUG')) Log::error($e);
                     }
                 
                 } else if($reason == 'subscription_cycle') {
-                    // try {
-                    //     $guild = $discord_helper->getGuild($guild_id);
-                    //     $role = $discord_helper->getRole($guild_id, $role_id);
-                    //     $discord_helper->sendMessage('You recurring subscription to the ' . $role->name . ' role in the ' . $guild->name . ' server has just been renewed!');
-
-                    //     $subscription = Subscription::where('id', $subscription_id)->first();
-                    //     $subscription->latest_invoice_id = $webhookCall->payload['data']['object']['id']; 
-                    //     $subscription->latest_invoice_paid_at = date('Y-m-d H:i:s');
-                    //     $subscription->latest_invoice_amount = $webhookCall->payload['data']['object']['amount_paid'];
-                    //     $subscription->status = $status;
-                    //     $subscription->level = $discord_store->level;
-                    //     $subscription->current_period_end = date("Y-m-d", $webhookCall->payload['data']['object']['lines']['data'][0]['period']['end']);
-                    //     $subscription->save();
-                    // } catch(\Exception $e) {
-                    //     $discord_helper->sendMessage('Uh-oh! Your recurring subscription could not be renewed! I canceled the subscription and refunded your primary payment method.');
-                    //     $discord_error = new \App\DiscordError();
-                    //     $discord_error->guild_id = $guild_id;
-                    //     $discord_error->role_id = $role_id;
-                    //     $discord_error->user_id = $customer_id;
-                    //     $discord_error->message = $e->getMessage();
-                    //     $this->cancelRefund($webhookCall);
-                    // }
+                    try {
+                        $subscription = Subscription::where('id', $subscription_id)->first();
+                        $subscription->latest_invoice_id = $webhookCall->payload['data']['object']['id']; 
+                        $subscription->latest_invoice_paid_at = date('Y-m-d H:i:s');
+                        $subscription->latest_invoice_amount = $webhookCall->payload['data']['object']['amount_paid'];
+                        $subscription->status = $status;
+                        $subscription->level = $discord_store->level;
+                        $subscription->current_period_end = date("Y-m-d", $webhookCall->payload['data']['object']['lines']['data'][0]['period']['end']);
+                        $subscription->save();
+                    } catch(\Exception $e) {
+                        $this->cancelRefund($webhookCall);
+                    }
                 }
              
             }
@@ -157,16 +173,17 @@ class PaymentSucceeded implements ShouldQueue
     }
 
     // {
-    //     "id": "evt_1HQGQCHTMWe6sDFb6rfPRTmk",
+    //     "id": "evt_1HYynNJp4H0gmhKCXfNmgCe4",
     //     "object": "event",
-    //     "api_version": "2019-08-14",
-    //     "created": 1599846747,
+    //     "api_version": "2020-08-27",
+    //     "created": 1601923944,
     //     "data": {
     //       "object": {
-    //         "id": "in_1HQGQAHTMWe6sDFbJ86OHH5l",
+    //         "id": "in_1HYynLJp4H0gmhKCCY4j0o0O",
     //         "object": "invoice",
     //         "account_country": "US",
-    //         "account_name": "BeastlyBot",
+    //         "account_name": "Twitter.BeastlyBot",
+    //         "account_tax_ids": null,
     //         "amount_due": 1000,
     //         "amount_paid": 1000,
     //         "amount_remaining": 0,
@@ -174,65 +191,58 @@ class PaymentSucceeded implements ShouldQueue
     //         "attempt_count": 1,
     //         "attempted": true,
     //         "auto_advance": false,
-    //         "billing": "charge_automatically",
     //         "billing_reason": "subscription_create",
-    //         "charge": "ch_1HQGQBHTMWe6sDFbDcWDMrkF",
+    //         "charge": "ch_1HYynMJp4H0gmhKCFjjkkw6G",
     //         "collection_method": "charge_automatically",
-    //         "created": 1599846746,
+    //         "created": 1601923943,
     //         "currency": "usd",
     //         "custom_fields": null,
-    //         "customer": "cus_Hzejn102gol501",
+    //         "customer": "cus_I9HDa8cKeH8ziS",
     //         "customer_address": null,
-    //         "customer_email": "colbymchenry@gmail.com",
-    //         "customer_name": null,
+    //         "customer_email": null,
+    //         "customer_name": "colbymchenry",
     //         "customer_phone": null,
     //         "customer_shipping": null,
     //         "customer_tax_exempt": "none",
-    //         "customer_tax_ids": [
-    //         ],
+    //         "customer_tax_ids": [],
     //         "default_payment_method": null,
     //         "default_source": null,
-    //         "default_tax_rates": [
-    //         ],
+    //         "default_tax_rates": [],
     //         "description": null,
     //         "discount": null,
-    //         "discounts": [
-    //         ],
+    //         "discounts": [],
     //         "due_date": null,
     //         "ending_balance": 0,
     //         "footer": null,
-    //         "hosted_invoice_url": "https://pay.stripe.com/invoice/acct_1FF2w1HTMWe6sDFb/invst_I0GyBoM3EENpBgXOYOCON26f96eH7G5",
-    //         "invoice_pdf": "https://pay.stripe.com/invoice/acct_1FF2w1HTMWe6sDFb/invst_I0GyBoM3EENpBgXOYOCON26f96eH7G5/pdf",
+    //         "hosted_invoice_url": "https://pay.stripe.com/invoice/acct_1HU2V5Jp4H0gmhKC/invst_I9HMz0prlDymTXamJ0dP6cYA6VjyJGV",
+    //         "invoice_pdf": "https://pay.stripe.com/invoice/acct_1HU2V5Jp4H0gmhKC/invst_I9HMz0prlDymTXamJ0dP6cYA6VjyJGV/pdf",
     //         "lines": {
     //           "object": "list",
     //           "data": [
     //             {
-    //               "id": "sli_bc37a7b46c8156",
+    //               "id": "il_1HYynLJp4H0gmhKC46Idkkp5",
     //               "object": "line_item",
     //               "amount": 1000,
     //               "currency": "usd",
-    //               "description": "1 × Premium Callout Group (at $10.00 / month)",
-    //               "discount_amounts": [
-    //               ],
+    //               "description": "1 × milkymilkway_ (at $10.00 / month)",
+    //               "discount_amounts": [],
     //               "discountable": true,
-    //               "discounts": [
-    //               ],
+    //               "discounts": [],
     //               "livemode": false,
-    //               "metadata": {
-    //               },
+    //               "metadata": [],
     //               "period": {
-    //                 "end": 1602438746,
-    //                 "start": 1599846746
+    //                 "end": 1604602343,
+    //                 "start": 1601923943
     //               },
     //               "plan": {
-    //                 "id": "discord_590728038849708043_596078383906029590_1_r",
+    //                 "id": "twitter_2755941776_1_r",
     //                 "object": "plan",
     //                 "active": true,
     //                 "aggregate_usage": null,
     //                 "amount": 1000,
     //                 "amount_decimal": "1000",
     //                 "billing_scheme": "per_unit",
-    //                 "created": 1599704617,
+    //                 "created": 1601923812,
     //                 "currency": "usd",
     //                 "interval": "month",
     //                 "interval_count": 1,
@@ -241,19 +251,18 @@ class PaymentSucceeded implements ShouldQueue
     //                   "user_id": "1"
     //                 },
     //                 "nickname": null,
-    //                 "product": "discord_590728038849708043_596078383906029590",
-    //                 "tiers": null,
+    //                 "product": "twitter_2755941776",
     //                 "tiers_mode": null,
     //                 "transform_usage": null,
     //                 "trial_period_days": null,
     //                 "usage_type": "licensed"
     //               },
     //               "price": {
-    //                 "id": "discord_590728038849708043_596078383906029590_1_r",
+    //                 "id": "twitter_2755941776_1_r",
     //                 "object": "price",
     //                 "active": true,
     //                 "billing_scheme": "per_unit",
-    //                 "created": 1599704617,
+    //                 "created": 1601923812,
     //                 "currency": "usd",
     //                 "livemode": false,
     //                 "lookup_key": null,
@@ -261,7 +270,7 @@ class PaymentSucceeded implements ShouldQueue
     //                   "user_id": "1"
     //                 },
     //                 "nickname": null,
-    //                 "product": "discord_590728038849708043_596078383906029590",
+    //                 "product": "twitter_2755941776",
     //                 "recurring": {
     //                   "aggregate_usage": null,
     //                   "interval": "month",
@@ -277,29 +286,25 @@ class PaymentSucceeded implements ShouldQueue
     //               },
     //               "proration": false,
     //               "quantity": 1,
-    //               "subscription": "sub_I0GyJhJrdhdlV8",
-    //               "subscription_item": "si_I0GyVmbmxD6YwT",
-    //               "tax_amounts": [
-    //               ],
-    //               "tax_rates": [
-    //               ],
-    //               "type": "subscription",
-    //               "unique_id": "il_1HQGQAHTMWe6sDFbsP905rL2"
+    //               "subscription": "sub_I9HMClgasDPenO",
+    //               "subscription_item": "si_I9HMuIsuzyD2WD",
+    //               "tax_amounts": [],
+    //               "tax_rates": [],
+    //               "type": "subscription"
     //             }
     //           ],
     //           "has_more": false,
     //           "total_count": 1,
-    //           "url": "/v1/invoices/in_1HQGQAHTMWe6sDFbJ86OHH5l/lines"
+    //           "url": "/v1/invoices/in_1HYynLJp4H0gmhKCCY4j0o0O/lines"
     //         },
     //         "livemode": false,
-    //         "metadata": {
-    //         },
+    //         "metadata": [],
     //         "next_payment_attempt": null,
-    //         "number": "399ED757-0027",
+    //         "number": "5712DE8F-0001",
     //         "paid": true,
-    //         "payment_intent": "pi_1HQGQAHTMWe6sDFb4FsqTJaN",
-    //         "period_end": 1599846746,
-    //         "period_start": 1599846746,
+    //         "payment_intent": "pi_1HYynLJp4H0gmhKCWgjWjcUX",
+    //         "period_end": 1601923943,
+    //         "period_start": 1601923943,
     //         "post_payment_credit_notes_amount": 0,
     //         "pre_payment_credit_notes_amount": 0,
     //         "receipt_number": null,
@@ -307,28 +312,25 @@ class PaymentSucceeded implements ShouldQueue
     //         "statement_descriptor": null,
     //         "status": "paid",
     //         "status_transitions": {
-    //           "finalized_at": 1599846746,
+    //           "finalized_at": 1601923943,
     //           "marked_uncollectible_at": null,
-    //           "paid_at": 1599846747,
+    //           "paid_at": 1601923944,
     //           "voided_at": null
     //         },
-    //         "subscription": "sub_I0GyJhJrdhdlV8",
+    //         "subscription": "sub_I9HMClgasDPenO",
     //         "subtotal": 1000,
     //         "tax": null,
-    //         "tax_percent": null,
     //         "total": 1000,
-    //         "total_discount_amounts": [
-    //         ],
-    //         "total_tax_amounts": [
-    //         ],
+    //         "total_discount_amounts": [],
+    //         "total_tax_amounts": [],
     //         "transfer_data": null,
-    //         "webhooks_delivered_at": null
+    //         "webhooks_delivered_at": 1601923943
     //       }
     //     },
     //     "livemode": false,
-    //     "pending_webhooks": 3,
+    //     "pending_webhooks": 1,
     //     "request": {
-    //       "id": "req_82cS4VMHkr2BYR",
+    //       "id": "req_Bp1iisTq4MzXXx",
     //       "idempotency_key": null
     //     },
     //     "type": "invoice.payment_succeeded"

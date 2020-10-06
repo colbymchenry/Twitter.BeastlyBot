@@ -35,6 +35,15 @@ class StripeConnectController extends Controller
             $stripe_connect = $user->StripeConnect();
             $stripe_connect->express_id = $stripe_account->id;
             $stripe_connect->save();
+
+            if(! \App\TwitterStore::where('twitter_id', auth()->user()->getTwitterAccount()->twitter_id)->exists()) {
+                \App\TwitterStore::create([
+                    'twitter_id' => auth()->user()->getTwitterAccount()->twitter_id,
+                    'url' => auth()->user()->getTwitterAccount()->twitter_id,
+                    'user_id' => auth()->user()->id
+                ]);
+            }
+
             AlertHelper::alertSuccess('Stripe account created! You can now accept payments.');
             return redirect('/dashboard');
         } else {

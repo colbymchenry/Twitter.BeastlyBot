@@ -25,6 +25,7 @@
         @yield('scripts')
 
         <script type="text/javascript">
+
             const Toast = Swal.mixin({
                 toast: true,
                 position: 'top-end',
@@ -33,6 +34,7 @@
             });
 
             $(document).ready(function () {
+
                 @if(Session::has('alert'))
                 Toast.fire({
                     type: '{{ Session::get('alert')['type'] }}',
@@ -44,5 +46,6 @@
             });
 
         </script>
+
     </body>
 </html>

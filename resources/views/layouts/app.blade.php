@@ -28,13 +28,20 @@
 @include('partials/scripts')
 
 <script type="text/javascript">
+    $(document).ready(function() {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        $('#btn-login').attr('onclick', `https://twitter.beastlybot.com/twitter/login?time_zone=${tz}`);
+        $('#a-login').attr('href', `https://twitter.beastlybot.com/twitter/login?time_zone=${tz}`);
+    });
+</script>
+
+<script type="text/javascript">
     const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
         showConfirmButton: false,
         timer: 3000
     });
-
     $(document).ready(function () {
         @if(Session::has('alert'))
         Toast.fire({

@@ -5,11 +5,11 @@ namespace App\Listeners;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Spatie\WebhookClient\Models\WebhookCall;
 use \App\StripeConnect;
-use \App\DiscordOAuth;
+use \App\TwitterAccount;
 use \App\NewSubscription;
 
 use \App\ScheduledInvoicePayout;
-use \App\DiscordStore;
+use \App\TwitterStore;
 use \App\Subscription;
 use \App\Stat;
 use \App\Dispute;
@@ -72,7 +72,7 @@ class DisputeUpdated implements ShouldQueue
         $charge_last4 = $charge['payment_method_details']['card']['last4'];
 
         $subscription = Subscription::where('id', $invoice_product_subscription)->first();
-        $shop = DiscordStore::where('id', $subscription->store_id)->first();
+        $shop = TwitterStore::where('id', $subscription->store_id)->first();
 
         // Start refund response
         if($subscription->refund_enabled == 1 && $subscription->refund_days > 0){
@@ -85,7 +85,7 @@ class DisputeUpdated implements ShouldQueue
             $subscription_refund_terms = "Clearly stated at purchase, Refunds not accepted and to purchase with trust in Shop Owner. Company Terms (agreed to with proven login customers can contact main support and we can cancel for the issue anytime and refunds are possible if deemed fit. This is a good company.";
         }
 
-        $discord_o_auth = DiscordOAuth::where('user_id', $subscription->user_id)->first();
+        $twitter_account = TwitterAccount::where('user_id', $subscription->user_id)->first();
         
         $dispute_id = $webhookCall->payload['data']['object']['id']; // "dp_
         
@@ -102,7 +102,7 @@ class DisputeUpdated implements ShouldQueue
             $stripe->disputes->update(
                 $dispute_id,
                 ['metadata' => ['evidence_submitted' => '2'],
-                'evidence' => ['uncategorized_text'=>'We are in the process of delivering a full refund to the customer, we thank them for the misunderstanding and are resolving the problem for future customers.', /*'customer_signature' => $discord_o_auth->access_token,*/ 'access_activity_log' => 'Updated at: ' . $discord_o_auth->updated_at . ' First login at: ' . $discord_o_auth->created_at . ' Discord OAuth ID: ' . $discord_o_auth->discord_id . 'Access by: Discord User Login', 'billing_address' => $charge_name . " " . $charge_postal_code . " " . $charge_country, 'customer_name' => $charge_name, 'customer_email_address' => $charge_email, 'product_description' => $invoice_product_description . ' on Discord Server ' . $shop->url . ', ' . $shop->description,/* 'receipt' => $invoice_pdf, */'refund_policy_disclosure' => 'Shop Purchase Terms: ' . $subscription_refund_terms, /*'refund_policy' => 'Company Terms: https://beastlybot.com/terms', 'cancellation_policy' => "Cancel anytime at https://beastlybot.com/account/subscriptions",*/ 'refund_refusal_explanation' => 'Refunds are allowed, explained and supported easily within purchase website.', 'service_date' => $subscription->updated_at, 'cancellation_rebuttal' => 'Subscription could be canceled any time anytime and could be fully refunded within '. $subscription->refund_days . ' days as noted on checkout. Subscription is already canceled due to dispute.'],
+                'evidence' => ['uncategorized_text'=>'We are in the process of delivering a full refund to the customer, we thank them for the misunderstanding and are resolving the problem for future customers.', /*'customer_signature' => $discord_o_auth->access_token,*/ 'access_activity_log' => 'Updated at: ' . $twitter_account->updated_at . ' First login at: ' . $twitter_account->created_at . ' Twitter OAuth ID: ' . $twitter_account->twitter_id . 'Access by: Twitter User Login', 'billing_address' => $charge_name . " " . $charge_postal_code . " " . $charge_country, 'customer_name' => $charge_name, 'customer_email_address' => $charge_email, 'product_description' => $invoice_product_description . ' on Discord Server ' . $shop->url . ', ' . $shop->description,/* 'receipt' => $invoice_pdf, */'refund_policy_disclosure' => 'Shop Purchase Terms: ' . $subscription_refund_terms, /*'refund_policy' => 'Company Terms: https://beastlybot.com/terms', 'cancellation_policy' => "Cancel anytime at https://beastlybot.com/account/subscriptions",*/ 'refund_refusal_explanation' => 'Refunds are allowed, explained and supported easily within purchase website.', 'service_date' => $subscription->updated_at, 'cancellation_rebuttal' => 'Subscription could be canceled any time anytime and could be fully refunded within '. $subscription->refund_days . ' days as noted on checkout. Subscription is already canceled due to dispute.'],
                 'submit' => true,
                 ]
             );

@@ -30,17 +30,17 @@
                 showConfirmButton: false,
                 timer: 3000
             });
+            @if(Session::has('alert'))
+                $(document).ready(function () {
+                    Toast.fire({
+                        type: '{{ Session::get('alert')['type'] }}',
+                        title: '{{ Session::get('alert')['msg'] }}'
+                    });
 
-            $(document).ready(function () {
-                @if(Session::has('alert'))
-                Toast.fire({
-                    type: '{{ Session::get('alert')['type'] }}',
-                    title: '{{ Session::get('alert')['msg'] }}'
                 });
 
                 {!! Session::forget('alert') !!}
-                @endif
-            });
+            @endif
 
         </script>
     </body>

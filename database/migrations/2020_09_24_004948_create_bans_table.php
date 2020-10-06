@@ -16,10 +16,9 @@ class CreateBansTable extends Migration
         Schema::create('bans', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->nullable();
-            $table->string('discord_id')->nullable();
+            $table->string('twitter_id')->nullable();
             $table->integer('type')->default(1); // 0 user from site, 1 user from view store, 2 user from create store
-            $table->integer('discord_store_id')->nullable();
-            $table->string('guild_id')->nullable();
+            $table->integer('twitter_store_id')->nullable();
             $table->string('until')->nullable();
             $table->string('active')->default(1);
             $table->longText('reason')->nullable();
